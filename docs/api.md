@@ -113,9 +113,80 @@ position
 options: id, text, value, position, match_side
 ```
 
-Correctness remains private until the future answer-submission endpoint checks
-the stored answer. Hiding UI elements is not a security boundary; excluding
-answer data from the JSON response is.
+Correctness remains private until the answer-submission endpoint checks the
+stored answer. Hiding UI elements is not a security boundary; excluding answer
+data from the JSON response is.
+
+## Lesson attempts
+
+Start a new attempt or resume the learner's existing in-progress attempt:
+
+```http
+POST /api/v1/lessons/{lesson_id}/attempts
+```
+
+The response identifies the current exercise, answered count, lesson size,
+attempt status, and remaining hearts. Repeating the request is idempotent while
+an active attempt exists.
+
+Submit exactly one answer for the current exercise:
+
+```http
+POST /api/v1/attempts/{attempt_id}/answers
+```
+
+```json
+{
+  "exercise_id": 12,
+  "answer": {
+    "value": "la niña"
+  }
+}
+```
+
+The answer object uses one shape according to exercise type:
+
+```text
+multiple_choice -> value
+word_bank       -> ordered tokens
+match_pairs     -> left/right option ID pairs
+fill_blank      -> text
+type_answer     -> text
+```
+
+The response returns immediate correctness, learner-safe feedback, the
+canonical answer after an incorrect non-match submission, explanation, updated
+hearts, attempt progress, and the next exercise ID.
+
+The API rejects:
+
+```text
+404 - attempt is absent or belongs to another learner
+409 - attempt is closed, or exercise is skipped/repeated
+422 - answer shape is invalid for the exercise
+```
+
+On the final answer, one transaction:
+
+1. completes the attempt;
+2. awards lesson XP;
+3. updates today's activity and streak;
+4. advances skill progress without double-counting practice;
+5. returns refreshed learner statistics.
+
+Wrong answers decrement both the learner's persistent hearts and the attempt
+snapshot. Reaching zero marks the attempt failed.
+
+## Heart refill
+
+The assignment permits a mocked refill:
+
+```http
+POST /api/v1/hearts/refill
+```
+
+It restores the authenticated learner to `max_hearts`. A failed attempt remains
+an immutable audit record; retrying creates a new attempt.
 
 ## Profile
 

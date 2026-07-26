@@ -70,9 +70,9 @@ beside their only consumer, while navigation configuration and path geometry
 live in one constants module. Styles are split by the same ownership boundaries
 as the components instead of accumulating in one global feature stylesheet.
 
-The temporary `/lesson/[lessonId]` route deliberately prevents a valid lesson
-link from ending at a 404 while the lesson-player checkpoint is still pending.
-It will be replaced by the interactive exercise session.
+The `/lesson/[lessonId]` route now hands the selected ID to the authenticated
+lesson feature. Invalid route IDs use the App Router's not-found boundary, while
+locked or unavailable lessons show recoverable API errors.
 
 ## State ownership
 
@@ -81,10 +81,9 @@ state, caching, retries, and refetching. The currently selected skill is local
 UI state because it is temporary, belongs to one component tree, and does not
 need persistence.
 
-Zustand is intentionally not installed yet. Introducing a global store for one
-selected identifier would add another state model without solving a real
-problem. The lesson player may justify a dedicated client store when it needs a
-multi-step session, optimistic answer feedback, and recovery.
+Zustand is intentionally not installed. The lesson session still has one local
+controller for its short-lived draft and feedback state. Persistent resume data
+lives in the backend attempt, so a global store would duplicate server state.
 
 ## Responsive behavior
 
@@ -105,6 +104,7 @@ The frontend tests mock the HTTP boundary, not component internals. They verify:
 2. An available skill links to the next unfinished lesson.
 3. A locked skill cannot be started.
 4. API failure produces a clear retry state.
+5. Lesson selection reaches the authenticated interactive player.
 
 Run them with:
 

@@ -252,6 +252,10 @@
   color: #ff9600;
 }
 
+.stat_xp {
+  color: #e1aa00;
+}
+
 .stat_gems {
   color: var(--gem);
 }

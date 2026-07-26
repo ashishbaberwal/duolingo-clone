@@ -1,4 +1,4 @@
-import { Apple, Flame, Gem, Heart } from "lucide-react";
+import { Apple, Flame, Gem, Heart, Zap } from "lucide-react";
 import type { LearnerStats } from "@/lib/api/types";
 import styles from "../../styles/app-shell.module.css";
 import { LogoMark } from "./logo-mark";
@@ -16,6 +16,7 @@ export function StatsBar({ stats }: StatsBarProps) {
       icon: Flame,
       tone: "streak",
     },
+    { label: "Total XP", value: stats.total_xp, icon: Zap, tone: "xp" },
     { label: "Gems", value: stats.gems, icon: Gem, tone: "gems" },
     {
       label: "Hearts",

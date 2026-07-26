@@ -126,6 +126,7 @@ describe("HomePage", () => {
       screen.getByRole("heading", { name: "First Steps" }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("Day streak: 7")).toBeInTheDocument();
+    expect(screen.getByLabelText("Total XP: 780")).toBeInTheDocument();
     expect(screen.getByLabelText("Hearts: 4/5")).toBeInTheDocument();
   });
 

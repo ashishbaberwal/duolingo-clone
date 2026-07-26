@@ -133,5 +133,6 @@ debugging and evaluation.
 - All tables use named constraints so Alembic migrations remain readable.
 - Timestamps are generated in UTC and declare timezone intent.
 
-The application service layer will still validate friendly business rules.
-Database constraints are the final protection against corrupted persisted data.
+The application service layer validates ownership, answer shape, exercise order,
+attempt status, heart loss, and completion rules. Database constraints remain
+the final protection against corrupted persisted data.

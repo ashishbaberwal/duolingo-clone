@@ -4,6 +4,8 @@
 - Date: 2026-07-26
 - Authentication note: ADR 005 extends this design with a current-user query,
   an authentication guard, and explicit login/logout mutations.
+- Lesson note: ADR 006 extends it with typed attempt mutations and a local
+  lesson-session controller.
 
 ## Context
 
@@ -62,13 +64,10 @@ installed.
 
 ## Why no global client store yet
 
-Only the selected skill is client-owned at this checkpoint. It belongs to the
-learning-path component and is discarded on navigation. A global store would
-increase indirection and create synchronization questions without a second
-consumer.
-
-Reconsider a store for the lesson session if multiple components must coordinate
-the current exercise, answer draft, hearts, progress, and resume state.
+Selected-skill state belongs to the learning path and lesson draft/feedback
+state belongs to one lesson controller. Persistent resume data belongs to the
+backend attempt. A global store would increase indirection and duplicate server
+state without a second client-side owner.
 
 ## Why not copy Duolingo exactly
 
@@ -107,4 +106,5 @@ CDN. The font package is resolved at install time and bundled with the app.
 - The page hydrates on the client before showing course content.
 - A future authenticated server-rendering pass may move query prefetching to the
   server without changing the visual components.
-- Global client state remains an intentional future decision.
+- Global client state remains unnecessary until unrelated routes need to edit
+  the same client-owned state.

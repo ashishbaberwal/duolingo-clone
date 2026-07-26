@@ -45,9 +45,9 @@ Client-side hiding does not prevent cheating. A learner can inspect browser
 network traffic or application state. The lesson read endpoint therefore sends
 only renderable prompts and options.
 
-Future answer submissions will send the learner's selection to FastAPI. The
-backend will load the private canonical answer, normalize the submission,
-evaluate correctness, update the attempt, and return feedback.
+Answer submissions send the learner's selection to FastAPI. The backend loads
+the private canonical answer, normalizes the submission, evaluates correctness,
+updates the attempt, and returns feedback. ADR 006 defines that lifecycle.
 
 ## Why path state is calculated in a service
 

@@ -17,6 +17,9 @@ The project currently includes:
 - Original LingoTrail visual system and Pip mascot
 - Local login page with Argon2 password hashing and HttpOnly cookie sessions
 - Protected learner pages and API endpoints with login and logout flows
+- Interactive lesson player with all five required exercise types
+- Immediate answer feedback, persistent hearts, XP, streaks, and skill progress
+- Resumable lesson attempts, completion celebration, and mocked heart refill
 - Versioned course, lesson, profile, and leaderboard APIs
 - SQLAlchemy domain model for content, progress, and lesson attempts
 - Alembic migration workflow with a reversible initial schema
@@ -152,6 +155,9 @@ GET  /api/v1/auth/me
 POST /api/v1/auth/logout
 GET /api/v1/path
 GET /api/v1/lessons/{lesson_id}
+POST /api/v1/lessons/{lesson_id}/attempts
+POST /api/v1/attempts/{attempt_id}/answers
+POST /api/v1/hearts/refill
 GET /api/v1/profile
 GET /api/v1/leaderboard
 ```
@@ -176,10 +182,15 @@ the response into:
 - completed, available, and locked skill controls;
 - a next-lesson action and recoverable API error state.
 
-The interface uses local state only for the currently open skill card. Server
-data remains in the query cache, and a global state library will be introduced
-only if the lesson-session workflow proves it is needed.
+The lesson route renders multiple choice, word bank, match-pair, fill-blank, and
+typed-answer exercises. FastAPI evaluates every submission, while React owns
+only the current draft and feedback transition. Persistent attempt, heart, XP,
+streak, and progress state remains authoritative on the backend.
 
 See the [frontend learning-path guide](docs/frontend-learning-path.md) and
 [ADR 004](docs/decisions/004-frontend-state-and-interaction.md) for component
 responsibilities, responsive behavior, and the alternatives considered.
+
+See the [lesson-loop guide](docs/lesson-loop.md) and
+[ADR 006](docs/decisions/006-lesson-attempt-lifecycle.md) for exercise payloads,
+answer privacy, transaction rules, and interview explanations.

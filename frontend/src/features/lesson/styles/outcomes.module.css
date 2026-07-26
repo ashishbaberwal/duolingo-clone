@@ -1,0 +1,304 @@
+.outcomeScreen {
+  min-height: 100vh;
+  padding: 42px 24px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 10%, rgb(255 200 0 / 18%), transparent 26%),
+    radial-gradient(circle at 10% 80%, rgb(88 204 2 / 10%), transparent 25%),
+    #fbfff7;
+}
+
+.completeCard,
+.heartsCard {
+  position: relative;
+  width: min(100%, 660px);
+  padding: 54px 56px 48px;
+  overflow: hidden;
+  color: var(--ink);
+  background: #fff;
+  border: 2px solid #e2edd9;
+  border-radius: 32px;
+  box-shadow:
+    0 8px 0 #d9e8ce,
+    0 28px 80px rgb(57 103 20 / 12%);
+  text-align: center;
+}
+
+.trophy {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  margin: 0 auto 24px;
+  display: grid;
+  place-items: center;
+  color: #9c6b00;
+  background: linear-gradient(145deg, #ffe66c, var(--sun));
+  border: 8px solid #fff6c6;
+  border-radius: 42% 42% 50% 50%;
+  box-shadow: 0 9px 0 var(--sun-deep);
+  transform: rotate(-3deg);
+}
+
+.trophy > svg {
+  width: 72px;
+  height: 72px;
+  stroke-width: 2.6;
+}
+
+.trophy span {
+  position: absolute;
+  right: -9px;
+  bottom: -8px;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--leaf);
+  border: 5px solid #fff;
+  border-radius: 50%;
+}
+
+.trophy span svg {
+  width: 24px;
+  stroke-width: 4;
+}
+
+.eyebrow {
+  display: block;
+  color: var(--leaf-deep);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+}
+
+.completeCard h1,
+.heartsCard h1 {
+  margin: 9px 0 8px;
+  color: #343434;
+  font-size: clamp(38px, 6vw, 54px);
+  font-weight: 950;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.completeCard > p,
+.heartsCard > p {
+  max-width: 480px;
+  margin: 0 auto;
+  color: #777;
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.resultGrid {
+  margin: 34px 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.resultGrid > div {
+  min-height: 122px;
+  padding: 16px 10px 12px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  color: #8a6800;
+  background: #fff8cf;
+  border: 2px solid #ffe66c;
+  border-radius: 18px;
+}
+
+.resultGrid > div:nth-child(2) {
+  color: #d35b00;
+  background: #fff0df;
+  border-color: #ffc47c;
+}
+
+.resultGrid > div:nth-child(3) {
+  color: #368900;
+  background: #edffdf;
+  border-color: #b8ef90;
+}
+
+.resultGrid svg {
+  width: 25px;
+  height: 25px;
+}
+
+.resultGrid strong {
+  margin-top: 3px;
+  font-size: 26px;
+  font-weight: 950;
+}
+
+.resultGrid span {
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.completeCard > a,
+.heartsCard > button {
+  width: 100%;
+  min-height: 56px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #fff;
+  background: var(--leaf);
+  border: 0;
+  border-radius: 17px;
+  box-shadow: 0 6px 0 var(--leaf-deep);
+  cursor: pointer;
+  font-weight: 950;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.completeCard > a svg,
+.heartsCard > button svg {
+  width: 20px;
+}
+
+.confetti i {
+  position: absolute;
+  width: 10px;
+  height: 20px;
+  background: var(--leaf);
+  border-radius: 4px;
+  transform: rotate(18deg);
+}
+
+.confetti i:nth-child(1) {
+  top: 50px;
+  left: 70px;
+  background: var(--sky);
+  transform: rotate(-28deg);
+}
+
+.confetti i:nth-child(2) {
+  top: 110px;
+  left: 35px;
+  background: var(--heart);
+  transform: rotate(48deg);
+}
+
+.confetti i:nth-child(3) {
+  top: 45px;
+  right: 72px;
+  background: var(--sun);
+  transform: rotate(32deg);
+}
+
+.confetti i:nth-child(4) {
+  top: 130px;
+  right: 40px;
+  background: var(--gem);
+  transform: rotate(-45deg);
+}
+
+.confetti i:nth-child(5) {
+  top: 230px;
+  left: 58px;
+  height: 10px;
+  background: var(--sun);
+}
+
+.confetti i:nth-child(6) {
+  top: 240px;
+  right: 62px;
+  height: 10px;
+  background: var(--heart);
+}
+
+.heartsCard {
+  border-color: #ffd1d1;
+  box-shadow:
+    0 8px 0 #f3c5c5,
+    0 28px 80px rgb(160 40 40 / 10%);
+}
+
+.brokenHeart {
+  position: relative;
+  width: 124px;
+  height: 124px;
+  margin: 0 auto 26px;
+  display: grid;
+  place-items: center;
+  color: var(--heart);
+  background: #fff0f0;
+  border-radius: 50%;
+}
+
+.brokenHeart svg {
+  width: 78px;
+  height: 78px;
+  filter: drop-shadow(0 6px 0 rgb(216 50 50 / 18%));
+}
+
+.brokenHeart span {
+  position: absolute;
+  color: #fff;
+  font-size: 25px;
+  font-weight: 950;
+}
+
+.heartsCard .eyebrow {
+  color: var(--heart-deep);
+}
+
+.heartsCard > button {
+  margin-top: 34px;
+  background: var(--heart);
+  box-shadow: 0 6px 0 var(--heart-deep);
+}
+
+.heartsCard > button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.heartsCard > a {
+  width: fit-content;
+  margin: 24px auto 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #888;
+  font-size: 14px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.heartsCard > a svg {
+  width: 18px;
+}
+
+@media (max-width: 600px) {
+  .completeCard,
+  .heartsCard {
+    padding: 42px 22px 34px;
+  }
+
+  .resultGrid {
+    gap: 7px;
+  }
+
+  .resultGrid > div {
+    min-height: 108px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .completeCard,
+  .heartsCard {
+    transform: none;
+  }
+}
