@@ -119,14 +119,14 @@ rankings. SQLite persists the result for each learner.
 The learning path displays ordered units, available and locked skills, lesson
 progress, the daily goal, league position, hearts, gems, XP, and streak.
 
-![LingoTrail learning path](docs/assets/learning-path.jpg)
+![LingoTrail learning path](.github/assets/learning-path.jpg)
 
 ### Learner profile
 
 The profile combines identity, total XP, streak history, completed lessons,
 daily-goal progress, and earned achievements.
 
-![LingoTrail learner profile](docs/assets/profile.jpg)
+![LingoTrail learner profile](.github/assets/profile.jpg)
 
 ## How to use LingoTrail
 
@@ -568,6 +568,9 @@ FastAPI generates Swagger UI and OpenAPI locally at `/docs` and
 
 ```text
 duolingo-clone/
+├── .github/
+│   ├── assets/                   README product screenshots
+│   └── workflows/               GitHub Actions deployment workflow
 ├── frontend/
 │   ├── src/
 │   │   ├── app/                  App Router pages and route layouts
@@ -596,9 +599,6 @@ duolingo-clone/
 │   ├── pyproject.toml
 │   └── uv.lock
 ├── deploy/digitalocean/          Caddy, systemd, env, and installer
-├── docs/
-│   ├── assets/                   Production screenshots
-│   └── decisions/                Architecture decision records
 ├── package.json                  Root commands
 ├── pnpm-workspace.yaml
 └── turbo.json
@@ -795,8 +795,8 @@ replacement could erase learner progress. A Droplet provides persistent disk
 storage. If the database moved to PostgreSQL, App Platform would become a
 reasonable alternative.
 
-The complete operational runbook is in
-[`docs/deployment.md`](docs/deployment.md).
+The committed files under `deploy/digitalocean/` provide the installation,
+update, Caddy, and systemd configuration used by the backend workflow.
 
 ## Engineering decisions and trade-offs
 
@@ -813,8 +813,8 @@ The complete operational runbook is in
 | Backend hostname | `sslip.io` | Purchased custom domain | Zero-cost demo DNS; not ideal long-term branding |
 | Seed data | Idempotent service | Raw database dump | Safe repeatable deployments; more seed logic |
 
-Architecture decision records with deeper reasoning are available in
-[`docs/decisions`](docs/decisions).
+The technical questions below expand on the most important architecture
+decisions and their trade-offs.
 
 ## Technical questions and answers
 
@@ -991,17 +991,6 @@ scaling constraint.
 - Settings, Quests, Shop, Search, and Guidebook are explicit placeholders.
 - The design is inspired by gamified language-learning patterns while using an
   original identity, mascot, codebase, and assets.
-
-## Further documentation
-
-- [Assignment compliance matrix](docs/assignment-compliance.md)
-- [Database schema](docs/database-schema.md)
-- [API contracts](docs/api.md)
-- [Authentication design](docs/authentication.md)
-- [Lesson lifecycle](docs/lesson-loop.md)
-- [Profile and leaderboard](docs/profile-and-leaderboard.md)
-- [Production runbook](docs/deployment.md)
-- [Architecture decision records](docs/decisions)
 
 ---
 
