@@ -5,16 +5,29 @@ import jwt
 from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 from pwdlib.exceptions import UnknownHashError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.config import Settings
 from app.models import User
-from app.repositories.auth import get_user_by_username
-from app.schemas.auth import AuthenticatedUserResponse
+from app.repositories.auth import get_user_by_email, get_user_by_username
+from app.schemas.auth import (
+    AuthenticatedUserResponse,
+    RegistrationRequest,
+    RegistrationResponse,
+)
 
 ALGORITHM = "HS256"
 password_hasher = PasswordHash.recommended()
 DUMMY_PASSWORD_HASH = password_hasher.hash("not-a-real-lingotrail-password")
+
+
+class UsernameAlreadyRegisteredError(Exception):
+    """Raised when registration requests an existing username."""
+
+
+class EmailAlreadyRegisteredError(Exception):
+    """Raised when registration requests an existing email address."""
 
 
 def hash_password(password: str) -> str:
@@ -39,6 +52,39 @@ def authenticate_user(
     if not password_matches(password, stored_hash):
         return None
 
+    return user
+
+
+def register_user(
+    session: Session,
+    registration: RegistrationRequest,
+) -> User:
+    if get_user_by_username(session, registration.username) is not None:
+        raise UsernameAlreadyRegisteredError
+    if get_user_by_email(session, str(registration.email)) is not None:
+        raise EmailAlreadyRegisteredError
+
+    user = User(
+        username=registration.username,
+        email=str(registration.email),
+        password_hash=hash_password(registration.password),
+        display_name=registration.display_name,
+        avatar_key="fox",
+        timezone="UTC",
+    )
+    session.add(user)
+
+    try:
+        session.commit()
+    except IntegrityError as error:
+        session.rollback()
+        if get_user_by_username(session, registration.username) is not None:
+            raise UsernameAlreadyRegisteredError from error
+        if get_user_by_email(session, str(registration.email)) is not None:
+            raise EmailAlreadyRegisteredError from error
+        raise
+
+    session.refresh(user)
     return user
 
 
@@ -84,4 +130,17 @@ def to_authenticated_user(user: User) -> AuthenticatedUserResponse:
         username=user.username,
         display_name=user.display_name,
         avatar_key=user.avatar_key,
+    )
+
+
+def to_registration_response(user: User) -> RegistrationResponse:
+    if user.email is None:
+        raise ValueError("Registered users must have an email address.")
+
+    return RegistrationResponse(
+        id=user.id,
+        username=user.username,
+        display_name=user.display_name,
+        avatar_key=user.avatar_key,
+        email=user.email,
     )

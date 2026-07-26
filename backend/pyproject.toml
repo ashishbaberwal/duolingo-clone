@@ -5,6 +5,7 @@ description = "FastAPI backend for the LingoTrail learning experience."
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "alembic>=1.16",
+  "email-validator>=2.2",
   "fastapi>=0.116",
   "pwdlib[argon2]>=0.3.0",
   "pydantic-settings>=2.10",

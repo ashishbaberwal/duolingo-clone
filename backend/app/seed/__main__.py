@@ -1,16 +1,10 @@
-from app.config import get_settings
 from app.db.session import SessionLocal
 from app.seed.service import seed_database
 
 
 def main() -> None:
-    settings = get_settings()
     with SessionLocal() as session:
-        result = seed_database(
-            session,
-            demo_username=settings.default_learner_username,
-            demo_password=settings.demo_learner_password,
-        )
+        result = seed_database(session)
 
     action = "created" if result.created else "already present"
     print(

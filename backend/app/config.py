@@ -14,8 +14,6 @@ class Settings(BaseSettings):
     frontend_origin: str = "http://localhost:3000"
     database_url: str = "sqlite:///./data/lingotrail.db"
     database_echo: bool = False
-    default_learner_username: str = "learner"
-    demo_learner_password: str = "LingoTrail@123"
     auth_secret_key: str = DEVELOPMENT_AUTH_SECRET
     auth_cookie_name: str = "lingotrail_session"
     auth_token_expire_minutes: int = Field(default=480, gt=0)

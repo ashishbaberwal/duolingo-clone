@@ -9,14 +9,45 @@ from app.schemas.auth import (
     AuthenticatedUserResponse,
     LoginRequest,
     LogoutResponse,
+    RegistrationRequest,
+    RegistrationResponse,
 )
 from app.services.auth import (
+    EmailAlreadyRegisteredError,
+    UsernameAlreadyRegisteredError,
     authenticate_user,
     create_session_token,
+    register_user,
     to_authenticated_user,
+    to_registration_response,
 )
 
 router = APIRouter(prefix="/auth")
+
+
+@router.post(
+    "/register",
+    response_model=RegistrationResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def register(
+    registration: RegistrationRequest,
+    session: SessionDependency,
+) -> RegistrationResponse:
+    try:
+        user = register_user(session, registration)
+    except UsernameAlreadyRegisteredError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="That username is already in use.",
+        ) from error
+    except EmailAlreadyRegisteredError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="That email address is already registered.",
+        ) from error
+
+    return to_registration_response(user)
 
 
 @router.post("/login", response_model=AuthenticatedUserResponse)

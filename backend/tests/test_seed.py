@@ -57,7 +57,7 @@ def test_seed_creates_complete_course_and_leaderboard(db_session: Session) -> No
     assert result.skills == 5
     assert result.lessons == 6
     assert result.exercises == 30
-    assert result.users == 5
+    assert result.users == 4
 
     exercise_types = set(db_session.scalars(select(Exercise.exercise_type)))
     assert exercise_types == set(ExerciseType)
@@ -70,7 +70,6 @@ def test_seed_creates_complete_course_and_leaderboard(db_session: Session) -> No
         "zara",
         "leo",
         "noah",
-        "learner",
     ]
 
 
@@ -100,35 +99,16 @@ def test_seeded_path_has_linear_prerequisites(db_session: Session) -> None:
     assert skills["Travel"].prerequisites == [skills["Family"]]
 
 
-def test_default_learner_has_consistent_partial_progress(db_session: Session) -> None:
+def test_seeded_competitors_cannot_login_and_have_no_learner_history(
+    db_session: Session,
+) -> None:
     seed_database(db_session, today=SEED_DATE)
 
-    learner = db_session.scalar(select(User).where(User.username == "learner"))
-    assert learner is not None
-    assert learner.total_xp == 10
-    assert learner.current_streak == 1
-    assert learner.longest_streak == 1
-
-    progress_by_skill = {
-        progress.skill.title: progress for progress in learner.skill_progress
-    }
-    assert len(progress_by_skill) == 5
-    assert progress_by_skill["Basics"].is_unlocked is True
-    assert progress_by_skill["Basics"].lessons_completed == 1
-    assert progress_by_skill["Basics"].is_completed is False
-    assert all(
-        not progress.is_unlocked
-        for skill_title, progress in progress_by_skill.items()
-        if skill_title != "Basics"
-    )
-
-    assert len(learner.lesson_attempts) == 1
-    attempt = learner.lesson_attempts[0]
-    assert attempt.status.value == "completed"
-    assert attempt.correct_count == len(attempt.answers) == 5
-    assert attempt.wrong_count == 0
-    assert attempt.xp_earned == 10
-
-    assert learner.daily_activity[0].activity_date == SEED_DATE
-    assert learner.daily_activity[0].xp_earned == 10
-    assert learner.achievements[0].achievement.code == "first-step"
+    competitors = list(db_session.scalars(select(User).order_by(User.username)))
+    assert len(competitors) == 4
+    assert all(competitor.password_hash == "!" for competitor in competitors)
+    assert all(competitor.email is None for competitor in competitors)
+    assert all(competitor.skill_progress == [] for competitor in competitors)
+    assert all(competitor.lesson_attempts == [] for competitor in competitors)
+    assert all(competitor.daily_activity == [] for competitor in competitors)
+    assert all(competitor.achievements == [] for competitor in competitors)

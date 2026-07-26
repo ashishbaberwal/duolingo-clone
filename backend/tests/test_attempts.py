@@ -16,7 +16,11 @@ from app.models import (
 )
 from app.seed import seed_database
 from app.services.stats import record_daily_streak
-from tests.helpers import lesson_id_by_title, login_demo
+from tests.helpers import (
+    TEST_USERNAME,
+    lesson_id_by_title,
+    register_and_login_user,
+)
 
 
 def lesson_payload(
@@ -34,17 +38,19 @@ def correct_answer_for(
     exercise_payload: dict[str, Any],
 ) -> dict[str, object]:
     exercise_type = exercise_payload["exercise_type"]
-    if exercise_type == "multiple_choice":
-        return {"value": "la niña"}
-    if exercise_type == "word_bank":
-        return {"tokens": ["él", "es", "un", "hombre"]}
-    if exercise_type == "fill_blank":
-        return {"text": "es"}
-    if exercise_type == "type_answer":
-        return {"text": "  EL NIÑO! "}
-
     exercise = session.get(Exercise, exercise_payload["id"])
     assert exercise is not None
+
+    if exercise_type == "multiple_choice":
+        return {"value": exercise.correct_answer}
+    if exercise_type == "word_bank":
+        assert exercise.correct_answer is not None
+        return {"tokens": exercise.correct_answer.split()}
+    if exercise_type == "fill_blank":
+        return {"text": exercise.correct_answer}
+    if exercise_type == "type_answer":
+        return {"text": exercise.correct_answer}
+
     options_by_pair: defaultdict[str, dict[MatchSide, int]] = defaultdict(dict)
     for option in exercise.options:
         assert option.pair_key is not None
@@ -93,8 +99,8 @@ def test_starting_an_attempt_is_resumable_and_idempotent(
     api_client: TestClient,
 ) -> None:
     seed_database(db_session)
-    login_demo(api_client)
-    lesson_id = lesson_id_by_title(db_session, "Basics 2")
+    register_and_login_user(api_client)
+    lesson_id = lesson_id_by_title(db_session, "Basics 1")
 
     first = api_client.post(f"/api/v1/lessons/{lesson_id}/attempts")
     second = api_client.post(f"/api/v1/lessons/{lesson_id}/attempts")
@@ -107,7 +113,7 @@ def test_starting_an_attempt_is_resumable_and_idempotent(
     attempt_count = db_session.scalar(
         select(func.count()).select_from(LessonAttempt)
     )
-    assert attempt_count == 2  # One seeded completion and one new active attempt.
+    assert attempt_count == 1
 
 
 def test_wrong_answer_loses_a_heart_and_cannot_be_resubmitted(
@@ -115,8 +121,8 @@ def test_wrong_answer_loses_a_heart_and_cannot_be_resubmitted(
     api_client: TestClient,
 ) -> None:
     seed_database(db_session)
-    login_demo(api_client)
-    lesson_id = lesson_id_by_title(db_session, "Basics 2")
+    register_and_login_user(api_client)
+    lesson_id = lesson_id_by_title(db_session, "Basics 1")
     lesson = lesson_payload(api_client, db_session, lesson_id)
     start = api_client.post(f"/api/v1/lessons/{lesson_id}/attempts").json()
     first_exercise = lesson["exercises"][0]
@@ -132,7 +138,7 @@ def test_wrong_answer_loses_a_heart_and_cannot_be_resubmitted(
     assert response.status_code == 200
     feedback = response.json()
     assert feedback["is_correct"] is False
-    assert feedback["correct_answer"] == "la niña"
+    assert feedback["correct_answer"] == "hola"
     assert feedback["hearts_remaining"] == 4
     assert feedback["learner"]["hearts"] == 4
     assert feedback["next_exercise_id"] == lesson["exercises"][1]["id"]
@@ -155,11 +161,14 @@ def test_all_exercise_types_complete_lesson_and_persist_progress(
     api_client: TestClient,
 ) -> None:
     seed_database(db_session)
-    login_demo(api_client)
-    lesson_id = lesson_id_by_title(db_session, "Basics 2")
+    register_and_login_user(api_client)
+    first_lesson_id = lesson_id_by_title(db_session, "Basics 1")
+    second_lesson_id = lesson_id_by_title(db_session, "Basics 2")
 
-    feedback = complete_lesson(api_client, db_session, lesson_id)
+    first_feedback = complete_lesson(api_client, db_session, first_lesson_id)
+    feedback = complete_lesson(api_client, db_session, second_lesson_id)
 
+    assert first_feedback["learner"]["total_xp"] == 10
     assert feedback["status"] == "completed"
     assert feedback["answered_count"] == feedback["exercise_count"] == 5
     assert feedback["next_exercise_id"] is None
@@ -168,7 +177,7 @@ def test_all_exercise_types_complete_lesson_and_persist_progress(
     assert feedback["learner"]["today_xp"] == 20
     assert feedback["learner"]["hearts"] == 5
 
-    learner = db_session.scalar(select(User).where(User.username == "learner"))
+    learner = db_session.scalar(select(User).where(User.username == TEST_USERNAME))
     assert learner is not None
     progress = db_session.scalar(
         select(UserSkillProgress).where(
@@ -184,7 +193,7 @@ def test_all_exercise_types_complete_lesson_and_persist_progress(
     answer_count = db_session.scalar(
         select(func.count()).select_from(AttemptAnswer)
     )
-    assert answer_count == 10  # Five seeded answers and five new submissions.
+    assert answer_count == 10
 
     path = api_client.get("/api/v1/path")
     assert path.status_code == 200
@@ -202,14 +211,14 @@ def test_practice_awards_xp_without_double_counting_skill_progress(
     api_client: TestClient,
 ) -> None:
     seed_database(db_session)
-    login_demo(api_client)
-    lesson_id = lesson_id_by_title(db_session, "Basics 2")
+    register_and_login_user(api_client)
+    lesson_id = lesson_id_by_title(db_session, "Basics 1")
 
     complete_lesson(api_client, db_session, lesson_id)
     second_completion = complete_lesson(api_client, db_session, lesson_id)
 
-    assert second_completion["learner"]["total_xp"] == 30
-    learner = db_session.scalar(select(User).where(User.username == "learner"))
+    assert second_completion["learner"]["total_xp"] == 20
+    learner = db_session.scalar(select(User).where(User.username == TEST_USERNAME))
     assert learner is not None
     progress = db_session.scalar(
         select(UserSkillProgress).where(
@@ -218,8 +227,8 @@ def test_practice_awards_xp_without_double_counting_skill_progress(
         )
     )
     assert progress is not None
-    assert progress.lessons_completed == 2
-    assert progress.crowns == 1
+    assert progress.lessons_completed == 1
+    assert progress.crowns == 0
 
 
 def test_zero_hearts_fails_attempt_until_mock_refill(
@@ -227,12 +236,12 @@ def test_zero_hearts_fails_attempt_until_mock_refill(
     api_client: TestClient,
 ) -> None:
     seed_database(db_session)
-    learner = db_session.scalar(select(User).where(User.username == "learner"))
+    register_and_login_user(api_client)
+    learner = db_session.scalar(select(User).where(User.username == TEST_USERNAME))
     assert learner is not None
     learner.hearts = 1
     db_session.commit()
-    login_demo(api_client)
-    lesson_id = lesson_id_by_title(db_session, "Basics 2")
+    lesson_id = lesson_id_by_title(db_session, "Basics 1")
     lesson = lesson_payload(api_client, db_session, lesson_id)
     start = api_client.post(f"/api/v1/lessons/{lesson_id}/attempts").json()
 
@@ -278,8 +287,8 @@ def test_invalid_answer_shape_is_rejected_without_recording_answer(
     api_client: TestClient,
 ) -> None:
     seed_database(db_session)
-    login_demo(api_client)
-    lesson_id = lesson_id_by_title(db_session, "Basics 2")
+    register_and_login_user(api_client)
+    lesson_id = lesson_id_by_title(db_session, "Basics 1")
     lesson = lesson_payload(api_client, db_session, lesson_id)
     start = api_client.post(f"/api/v1/lessons/{lesson_id}/attempts").json()
 
@@ -328,7 +337,7 @@ def test_locked_lesson_cannot_start_attempt(
     api_client: TestClient,
 ) -> None:
     seed_database(db_session)
-    login_demo(api_client)
+    register_and_login_user(api_client)
     lesson_id = lesson_id_by_title(db_session, "Greetings 1")
 
     response = api_client.post(f"/api/v1/lessons/{lesson_id}/attempts")

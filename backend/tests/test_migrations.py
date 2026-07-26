@@ -30,7 +30,7 @@ def test_initial_migration_is_reversible_and_matches_models(tmp_path: Path) -> N
     assert "No new upgrade operations detected" in drift_check.stdout
 
 
-def test_password_migration_preserves_existing_users(tmp_path: Path) -> None:
+def test_migrations_remove_fixed_demo_and_preserve_other_users(tmp_path: Path) -> None:
     database_path = tmp_path / "populated-migration-test.db"
     database_url = f"sqlite:///{database_path}"
     run_alembic(database_url, "upgrade", "2bca21859cef")
@@ -49,12 +49,25 @@ def test_password_migration_preserves_existing_users(tmp_path: Path) -> None:
             )
             """
         )
+        connection.execute(
+            """
+            INSERT INTO users (
+                username, display_name, avatar_key, timezone, hearts,
+                max_hearts, gems, total_xp, current_streak, longest_streak,
+                daily_goal_xp, created_at, updated_at
+            ) VALUES (
+                'existing-user', 'Existing User', 'owl', 'UTC', 5,
+                5, 500, 0, 0, 0,
+                20, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            )
+            """
+        )
 
     run_alembic(database_url, "upgrade", "head")
 
     with sqlite3.connect(database_path) as connection:
-        row = connection.execute(
-            "SELECT username, password_hash FROM users"
-        ).fetchone()
+        rows = connection.execute(
+            "SELECT username, password_hash FROM users ORDER BY username"
+        ).fetchall()
 
-    assert row == ("learner", "!")
+    assert rows == [("existing-user", "!")]

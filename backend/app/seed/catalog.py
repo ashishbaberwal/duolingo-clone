@@ -430,8 +430,7 @@ ACHIEVEMENT_SEEDS = (
     ("perfect-lesson", "Perfect Lesson", "Finish without a mistake.", "trophy", 10),
 )
 
-LEARNER_SEEDS = (
-    ("learner", "Ava", "fox", 10, 1, 1),
+LEADERBOARD_SEEDS = (
     ("maya", "Maya", "owl", 780, 8, 12),
     ("zara", "Zara", "bear", 650, 5, 9),
     ("leo", "Leo", "lion", 420, 2, 6),

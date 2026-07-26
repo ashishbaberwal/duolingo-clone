@@ -1,31 +1,22 @@
 from dataclasses import dataclass
-from datetime import UTC, date, datetime
+from datetime import date
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models import (
     Achievement,
-    AttemptAnswer,
     Course,
-    DailyActivity,
     Exercise,
     ExerciseOption,
     Lesson,
-    LessonAttempt,
     Skill,
     Unit,
     User,
-    UserAchievement,
-    UserSkillProgress,
 )
-from app.models.enums import AttemptStatus
-from app.seed.catalog import ACHIEVEMENT_SEEDS, COURSE_UNITS, LEARNER_SEEDS
-from app.services.auth import hash_password, password_matches
+from app.seed.catalog import ACHIEVEMENT_SEEDS, COURSE_UNITS, LEADERBOARD_SEEDS
 
 COURSE_CODE = "es-en"
-DEFAULT_DEMO_USERNAME = "learner"
-DEFAULT_DEMO_PASSWORD = "LingoTrail@123"
 
 
 @dataclass(frozen=True, slots=True)
@@ -134,23 +125,14 @@ def _build_course() -> tuple[Course, dict[str, Skill], dict[str, Lesson]]:
     return course, skills_by_key, lessons_by_title
 
 
-def _build_learners(
-    today: date,
-    *,
-    demo_username: str,
-    demo_password: str,
-) -> dict[str, User]:
+def _build_leaderboard_users(today: date) -> list[User]:
     learners: dict[str, User] = {}
     for username, display_name, avatar_key, total_xp, current_streak, longest_streak in (
-        LEARNER_SEEDS
+        LEADERBOARD_SEEDS
     ):
         learner = User(
             username=username,
-            password_hash=(
-                hash_password(demo_password)
-                if username == demo_username
-                else "!"
-            ),
+            password_hash="!",
             display_name=display_name,
             avatar_key=avatar_key,
             timezone="Asia/Kolkata",
@@ -165,111 +147,23 @@ def _build_learners(
         )
         learners[username] = learner
 
-    return learners
-
-
-def _ensure_demo_credentials(
-    session: Session,
-    *,
-    demo_username: str,
-    demo_password: str,
-) -> None:
-    learner = session.scalar(select(User).where(User.username == demo_username))
-    if learner is None:
-        return
-
-    if not password_matches(demo_password, learner.password_hash):
-        learner.password_hash = hash_password(demo_password)
-        session.commit()
-
-
-def _add_default_learner_progress(
-    session: Session,
-    learner: User,
-    skills_by_key: dict[str, Skill],
-    lessons_by_title: dict[str, Lesson],
-    achievements_by_code: dict[str, Achievement],
-    today: date,
-) -> None:
-    first_lesson = lessons_by_title["Basics 1"]
-
-    for skill_key, skill in skills_by_key.items():
-        learner.skill_progress.append(
-            UserSkillProgress(
-                skill=skill,
-                lessons_completed=1 if skill_key == "basics" else 0,
-                crowns=0,
-                is_unlocked=skill_key == "basics",
-                is_completed=False,
-                completed_at=None,
-            )
-        )
-
-    completed_at = datetime.now(UTC)
-    attempt = LessonAttempt(
-        lesson=first_lesson,
-        status=AttemptStatus.COMPLETED,
-        hearts_at_start=5,
-        hearts_remaining=5,
-        correct_count=len(first_lesson.exercises),
-        wrong_count=0,
-        xp_earned=first_lesson.xp_reward,
-        started_at=completed_at,
-        completed_at=completed_at,
-    )
-    learner.lesson_attempts.append(attempt)
-
-    for exercise in first_lesson.exercises:
-        attempt.answers.append(
-            AttemptAnswer(
-                exercise=exercise,
-                submitted_answer={"value": exercise.correct_answer},
-                is_correct=True,
-                feedback="Correct",
-            )
-        )
-
-    learner.daily_activity.append(
-        DailyActivity(
-            activity_date=today,
-            xp_earned=first_lesson.xp_reward,
-            lessons_completed=1,
-        )
-    )
-    learner.achievements.append(
-        UserAchievement(
-            achievement=achievements_by_code["first-step"],
-            unlocked_at=completed_at,
-        )
-    )
-    session.add(learner)
+    return list(learners.values())
 
 
 def seed_database(
     session: Session,
     *,
     today: date | None = None,
-    demo_username: str = DEFAULT_DEMO_USERNAME,
-    demo_password: str = DEFAULT_DEMO_PASSWORD,
 ) -> SeedResult:
     existing_course = session.scalar(select(Course.id).where(Course.code == COURSE_CODE))
     if existing_course is not None:
-        _ensure_demo_credentials(
-            session,
-            demo_username=demo_username,
-            demo_password=demo_password,
-        )
         return _database_counts(session, created=False)
 
     seed_date = today or date.today()
 
     try:
-        course, skills_by_key, lessons_by_title = _build_course()
-        learners = _build_learners(
-            seed_date,
-            demo_username=demo_username,
-            demo_password=demo_password,
-        )
+        course, _, _ = _build_course()
+        leaderboard_users = _build_leaderboard_users(seed_date)
         achievements_by_code = {
             code: Achievement(
                 code=code,
@@ -282,16 +176,8 @@ def seed_database(
         }
 
         session.add(course)
-        session.add_all(learners.values())
+        session.add_all(leaderboard_users)
         session.add_all(achievements_by_code.values())
-        _add_default_learner_progress(
-            session,
-            learners["learner"],
-            skills_by_key,
-            lessons_by_title,
-            achievements_by_code,
-            seed_date,
-        )
         session.commit()
     except Exception:
         session.rollback()
