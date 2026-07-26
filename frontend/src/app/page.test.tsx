@@ -168,6 +168,36 @@ describe("HomePage", () => {
     ).toBeDisabled();
   });
 
+  it("shows and dismisses feedback for settings placeholders", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(jsonResponse(authenticatedUser))
+        .mockResolvedValue(jsonResponse(learningPath)),
+    );
+    renderPage();
+
+    fireEvent.click(
+      await screen.findByRole("button", {
+        name: "Settings, coming soon",
+      }),
+    );
+
+    expect(
+      screen.getByText("Settings is coming soon."),
+    ).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Dismiss notification" }),
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Settings is coming soon."),
+      ).not.toBeInTheDocument();
+    });
+  });
+
   it(
     "shows a recoverable error when the API is unavailable",
     async () => {

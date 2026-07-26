@@ -7,9 +7,13 @@ import { NAVIGATION_ITEMS, type AppSection } from "./navigation";
 
 interface SidebarProps {
   activeSection: AppSection;
+  onPlaceholderSelect: (feature: string) => void;
 }
 
-export function Sidebar({ activeSection }: SidebarProps) {
+export function Sidebar({
+  activeSection,
+  onPlaceholderSelect,
+}: SidebarProps) {
   return (
     <aside className={styles.sidebar}>
       <Link className={styles.brand} href="/" aria-label="LingoTrail home">
@@ -42,6 +46,7 @@ export function Sidebar({ activeSection }: SidebarProps) {
               key={key}
               type="button"
               aria-label={`${label}, coming soon`}
+              onClick={() => onPlaceholderSelect(label)}
             >
               {content}
             </button>

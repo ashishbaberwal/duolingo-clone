@@ -1,6 +1,6 @@
 import {
   Home,
-  MoreHorizontal,
+  Settings,
   ShoppingBag,
   Target,
   Trophy,
@@ -10,7 +10,7 @@ import {
 
 export type AppSection = "learn" | "leaderboard" | "profile";
 
-type NavigationKey = AppSection | "quests" | "shop" | "more";
+type NavigationKey = AppSection | "quests" | "shop" | "settings";
 
 interface NavigationItem {
   key: NavigationKey;
@@ -30,7 +30,7 @@ export const NAVIGATION_ITEMS: readonly NavigationItem[] = [
   { key: "quests", label: "Quests", icon: Target },
   { key: "shop", label: "Shop", icon: ShoppingBag },
   { key: "profile", label: "Profile", icon: UserRound, href: "/profile" },
-  { key: "more", label: "More", icon: MoreHorizontal },
+  { key: "settings", label: "Settings", icon: Settings },
 ];
 
 const MOBILE_KEYS: readonly NavigationKey[] = [

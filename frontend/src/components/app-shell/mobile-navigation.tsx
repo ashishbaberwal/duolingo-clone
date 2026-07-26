@@ -5,9 +5,13 @@ import { MOBILE_NAVIGATION_ITEMS, type AppSection } from "./navigation";
 
 interface MobileNavigationProps {
   activeSection: AppSection;
+  onPlaceholderSelect: (feature: string) => void;
 }
 
-export function MobileNavigation({ activeSection }: MobileNavigationProps) {
+export function MobileNavigation({
+  activeSection,
+  onPlaceholderSelect,
+}: MobileNavigationProps) {
   return (
     <nav className={styles.mobileNav} aria-label="Mobile navigation">
       {MOBILE_NAVIGATION_ITEMS.map(({ key, label, icon: Icon, href }) => {
@@ -33,6 +37,7 @@ export function MobileNavigation({ activeSection }: MobileNavigationProps) {
             key={key}
             type="button"
             aria-label={`${label}, coming soon`}
+            onClick={() => onPlaceholderSelect(label)}
           >
             {content}
           </button>
