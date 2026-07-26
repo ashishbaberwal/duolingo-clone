@@ -12,7 +12,7 @@ FastAPI GET /api/v1/path
             v
 typed fetch client -> TanStack Query cache -> LearnPage
                                                 |
-                         AppShell ---------------+---- LearningPath
+                      AuthGuard -> AppShell -----+---- LearningPath
                          |                            |
                   navigation/stats              units and skill nodes
 ```
@@ -51,8 +51,7 @@ features/learn/
 │   │   ├── trail-decoration.tsx
 │   │   ├── unit-banner.tsx
 │   │   └── unit-section.tsx
-│   ├── page-states/
-│   └── pip-mascot.tsx
+│   └── page-states/
 ├── styles/
 │   ├── app-shell.module.css
 │   ├── learn-page.module.css
@@ -61,6 +60,10 @@ features/learn/
 ├── learn-page.tsx
 └── learn.constants.ts
 ```
+
+The original Pip mascot now lives under `src/components/brand` because both the
+authentication and learning features use it. Promoting it avoids a circular
+feature dependency.
 
 Substantial visual components have one module each. Tiny calculations stay
 beside their only consumer, while navigation configuration and path geometry

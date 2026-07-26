@@ -1,7 +1,7 @@
 import { RefreshCw, WifiOff } from "lucide-react";
 import { motion } from "motion/react";
+import { PipMascot } from "@/components/brand/pip-mascot";
 import styles from "../../styles/learn-page.module.css";
-import { PipMascot } from "../pip-mascot";
 
 interface ErrorStateProps {
   message: string;

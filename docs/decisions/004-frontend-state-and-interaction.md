@@ -2,6 +2,8 @@
 
 - Status: Accepted
 - Date: 2026-07-26
+- Authentication note: ADR 005 extends this design with a current-user query,
+  an authentication guard, and explicit login/logout mutations.
 
 ## Context
 
@@ -24,8 +26,8 @@ Use:
 - A bundled variable Nunito font to avoid a runtime font-network dependency.
 
 Keep the first learning-path request client-side. This makes loading, retry, and
-future learner-session refresh behavior explicit while authentication is still
-represented by the backend's default learner.
+learner-session refresh behavior explicit. ADR 005 later places the request
+behind a verified current-user query.
 
 Pin production builds to Next.js's webpack compiler for this assignment. The
 development server still uses Turbopack, while webpack currently gives the
@@ -79,10 +81,9 @@ learning-path interaction model.
 
 ### Server-render the path only
 
-Rejected for this checkpoint because the API currently resolves a configured
-default learner and the interface must demonstrate retry and refresh behavior.
-A server component can be introduced later when real authentication provides a
-request-bound identity.
+Rejected for this checkpoint because the interface must demonstrate retry and
+refresh behavior. A server component can be introduced later if request-bound
+identity is forwarded from the authenticated session.
 
 ### Redux or Zustand for all state
 

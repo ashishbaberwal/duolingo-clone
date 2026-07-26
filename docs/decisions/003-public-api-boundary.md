@@ -2,6 +2,9 @@
 
 - Status: Accepted
 - Date: 2026-07-26
+- Authentication note: ADR 005 replaces the temporary default-learner
+  resolution described here; the API layering and response-boundary decisions
+  remain active.
 
 ## Context
 
@@ -23,8 +26,9 @@ Use four layers:
 
 Return explicit Pydantic response models rather than ORM entities.
 
-Use `/api/v1` as a stable version prefix. Resolve the configured default learner
-through one dependency so real authentication can replace it later.
+Use `/api/v1` as a stable version prefix. At this checkpoint, resolve the
+configured default learner through one dependency so real authentication can
+replace it later.
 
 ## Why response schemas are separate from ORM models
 
@@ -77,9 +81,9 @@ The backend must remain authoritative.
 
 ### Implement full authentication now
 
-Rejected because the assignment explicitly permits a default learner and the
-20-hour schedule prioritizes the lesson loop. The dependency boundary preserves
-a clean upgrade path to token-based authentication.
+Initially rejected because the assignment explicitly permitted a default
+learner and the lesson loop had higher scheduling priority. ADR 005 later uses
+the dependency boundary established here to add cookie-based authentication.
 
 ### GraphQL
 
@@ -90,7 +94,7 @@ is simpler to implement, test, document, and explain within the assignment.
 
 - More schema classes exist, but the public surface is deliberate and typed.
 - Services must explicitly map domain entities into response contracts.
-- Adding authentication later requires replacing the learner dependency rather
-  than rewriting every endpoint.
+- Authentication can replace the learner dependency without rewriting every
+  endpoint; ADR 005 demonstrates that upgrade.
 - Exercise correctness cannot be implemented as frontend-only logic.
 - OpenAPI documents only fields that learners are permitted to receive.

@@ -32,6 +32,7 @@ class User(TimestampMixin, Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(255), default="!")
     display_name: Mapped[str] = mapped_column(String(100))
     email: Mapped[str | None] = mapped_column(String(255), unique=True)
     avatar_key: Mapped[str] = mapped_column(String(50), default="fox")

@@ -1,7 +1,21 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { QueryProvider } from "@/providers/query-provider";
 import HomePage from "./page";
+
+const replace = vi.fn();
+const refresh = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace, refresh }),
+}));
+
+const authenticatedUser = {
+  id: 1,
+  username: "learner",
+  display_name: "Ava",
+  avatar_key: "fox",
+};
 
 const learningPath = {
   course: {
@@ -93,12 +107,15 @@ describe("HomePage", () => {
   it("renders learner progress from the path API", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue(jsonResponse(learningPath)),
+      vi
+        .fn()
+        .mockResolvedValueOnce(jsonResponse(authenticatedUser))
+        .mockResolvedValue(jsonResponse(learningPath)),
     );
     renderPage();
 
     expect(
-      screen.getByLabelText("Loading learning path"),
+      screen.getByLabelText("Checking your session"),
     ).toBeInTheDocument();
     expect(
       await screen.findByRole("heading", {
@@ -115,7 +132,10 @@ describe("HomePage", () => {
   it("opens skill details and links to the next unfinished lesson", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockResolvedValue(jsonResponse(learningPath)),
+      vi
+        .fn()
+        .mockResolvedValueOnce(jsonResponse(authenticatedUser))
+        .mockResolvedValue(jsonResponse(learningPath)),
     );
     renderPage();
 
@@ -154,6 +174,7 @@ describe("HomePage", () => {
         "fetch",
         vi
           .fn()
+          .mockResolvedValueOnce(jsonResponse(authenticatedUser))
           .mockResolvedValue(
             jsonResponse({ detail: "Course service is unavailable." }, 503),
           ),
@@ -176,4 +197,24 @@ describe("HomePage", () => {
     },
     4_000,
   );
+
+  it("clears an invalid session and redirects to login", async () => {
+    replace.mockClear();
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({ detail: "Authentication required." }, 401),
+        )
+        .mockResolvedValueOnce(
+          jsonResponse({ message: "Signed out successfully." }),
+        ),
+    );
+    renderPage();
+
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledWith("/login");
+    });
+  });
 });

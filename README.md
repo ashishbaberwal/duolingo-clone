@@ -15,6 +15,8 @@ The project currently includes:
 - Responsive, API-driven learning path with interactive skill states
 - Typed query boundary with loading, retry, and failure experiences
 - Original LingoTrail visual system and Pip mascot
+- Local login page with Argon2 password hashing and HttpOnly cookie sessions
+- Protected learner pages and API endpoints with login and logout flows
 - Versioned course, lesson, profile, and leaderboard APIs
 - SQLAlchemy domain model for content, progress, and lesson attempts
 - Alembic migration workflow with a reversible initial schema
@@ -65,6 +67,16 @@ pnpm dev
 - Backend: http://localhost:8000
 - API documentation: http://localhost:8000/docs
 - Health endpoint: http://localhost:8000/api/v1/health
+
+Local sign-in:
+
+```text
+URL:      http://localhost:3000/login
+Username: learner
+Password: LingoTrail@123
+```
+
+The password is local demo data. SQLite stores only its Argon2id hash.
 
 ## Quality checks
 
@@ -135,6 +147,9 @@ records. The complete dataset is described in
 The FastAPI service exposes versioned JSON endpoints under `/api/v1`:
 
 ```text
+POST /api/v1/auth/login
+GET  /api/v1/auth/me
+POST /api/v1/auth/logout
 GET /api/v1/path
 GET /api/v1/lessons/{lesson_id}
 GET /api/v1/profile
@@ -145,6 +160,10 @@ Interactive OpenAPI documentation is available at
 http://localhost:8000/docs. See the [API guide](docs/api.md) and
 [ADR 003](docs/decisions/003-public-api-boundary.md) for response contracts,
 privacy rules, and architectural decisions.
+
+See the [authentication guide](docs/authentication.md) and
+[ADR 005](docs/decisions/005-cookie-authentication.md) for cookie properties,
+token validation, local credentials, and production requirements.
 
 ## Frontend
 

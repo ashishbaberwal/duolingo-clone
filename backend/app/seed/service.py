@@ -21,8 +21,11 @@ from app.models import (
 )
 from app.models.enums import AttemptStatus
 from app.seed.catalog import ACHIEVEMENT_SEEDS, COURSE_UNITS, LEARNER_SEEDS
+from app.services.auth import hash_password, password_matches
 
 COURSE_CODE = "es-en"
+DEFAULT_DEMO_USERNAME = "learner"
+DEFAULT_DEMO_PASSWORD = "LingoTrail@123"
 
 
 @dataclass(frozen=True, slots=True)
@@ -131,13 +134,23 @@ def _build_course() -> tuple[Course, dict[str, Skill], dict[str, Lesson]]:
     return course, skills_by_key, lessons_by_title
 
 
-def _build_learners(today: date) -> dict[str, User]:
+def _build_learners(
+    today: date,
+    *,
+    demo_username: str,
+    demo_password: str,
+) -> dict[str, User]:
     learners: dict[str, User] = {}
     for username, display_name, avatar_key, total_xp, current_streak, longest_streak in (
         LEARNER_SEEDS
     ):
         learner = User(
             username=username,
+            password_hash=(
+                hash_password(demo_password)
+                if username == demo_username
+                else "!"
+            ),
             display_name=display_name,
             avatar_key=avatar_key,
             timezone="Asia/Kolkata",
@@ -153,6 +166,21 @@ def _build_learners(today: date) -> dict[str, User]:
         learners[username] = learner
 
     return learners
+
+
+def _ensure_demo_credentials(
+    session: Session,
+    *,
+    demo_username: str,
+    demo_password: str,
+) -> None:
+    learner = session.scalar(select(User).where(User.username == demo_username))
+    if learner is None:
+        return
+
+    if not password_matches(demo_password, learner.password_hash):
+        learner.password_hash = hash_password(demo_password)
+        session.commit()
 
 
 def _add_default_learner_progress(
@@ -217,16 +245,31 @@ def _add_default_learner_progress(
     session.add(learner)
 
 
-def seed_database(session: Session, *, today: date | None = None) -> SeedResult:
+def seed_database(
+    session: Session,
+    *,
+    today: date | None = None,
+    demo_username: str = DEFAULT_DEMO_USERNAME,
+    demo_password: str = DEFAULT_DEMO_PASSWORD,
+) -> SeedResult:
     existing_course = session.scalar(select(Course.id).where(Course.code == COURSE_CODE))
     if existing_course is not None:
+        _ensure_demo_credentials(
+            session,
+            demo_username=demo_username,
+            demo_password=demo_password,
+        )
         return _database_counts(session, created=False)
 
     seed_date = today or date.today()
 
     try:
         course, skills_by_key, lessons_by_title = _build_course()
-        learners = _build_learners(seed_date)
+        learners = _build_learners(
+            seed_date,
+            demo_username=demo_username,
+            demo_password=demo_password,
+        )
         achievements_by_code = {
             code: Achievement(
                 code=code,

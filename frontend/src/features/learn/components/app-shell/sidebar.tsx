@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { PipMascot } from "@/components/brand/pip-mascot";
+import { LogoutButton } from "@/features/auth";
 import { NAVIGATION_ITEMS } from "../../learn.constants";
 import styles from "../../styles/app-shell.module.css";
-import { PipMascot } from "../pip-mascot";
 import { LogoMark } from "./logo-mark";
 
 export function Sidebar() {
@@ -28,7 +29,10 @@ export function Sidebar() {
       </nav>
       <div className={styles.sidebarFooter}>
         <PipMascot className={styles.sidebarMascot} mood="focused" />
-        <p>Small steps. Real progress.</p>
+        <div className={styles.sidebarFooterContent}>
+          <p>Small steps. Real progress.</p>
+          <LogoutButton className={styles.sidebarLogout} />
+        </div>
       </div>
     </aside>
   );

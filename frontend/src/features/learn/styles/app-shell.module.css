@@ -164,6 +164,36 @@
   line-height: 1.35;
 }
 
+.sidebarFooterContent {
+  position: relative;
+  z-index: 2;
+}
+
+.sidebarLogout {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 9px;
+  padding: 0;
+  border: 0;
+  color: #6e9c51;
+  background: transparent;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.sidebarLogout:hover {
+  color: #ea2b2b;
+}
+
+.sidebarLogout svg {
+  width: 14px;
+  height: 14px;
+}
+
 .sidebarMascot {
   position: absolute;
   bottom: 4px;
@@ -553,6 +583,15 @@
   .mobileNav .mobileNavActive {
     color: var(--sky);
     background: #e7f8ff;
+  }
+
+  .mobileNav .mobileLogout {
+    color: #a0a0a0;
+  }
+
+  .mobileNav .mobileLogout:hover {
+    color: #ea2b2b;
+    background: #fff0f0;
   }
 }
 

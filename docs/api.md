@@ -11,25 +11,36 @@ Swagger UI: http://localhost:8000/docs
 OpenAPI:    http://localhost:8000/openapi.json
 ```
 
-## Default learner
+## Authentication
 
-The assignment permits simplified authentication. The API loads the configured
-`DEFAULT_LEARNER_USERNAME`, which defaults to `learner`.
-
-If the seed has not been run, learner endpoints return:
+Learner endpoints require the `lingotrail_session` HttpOnly cookie. Without a
+valid session they return:
 
 ```http
-503 Service Unavailable
+401 Unauthorized
 ```
 
 ```json
 {
-  "detail": "Default learner is unavailable. Run the database seed command."
+  "detail": "Authentication required."
 }
 ```
 
-This is preferable to a null error or an unexplained 500 response. Production
-authentication can later replace this dependency without rewriting services.
+Use the local login endpoint with the documented demo credentials:
+
+```http
+POST /api/v1/auth/login
+```
+
+Current-user and logout endpoints are:
+
+```text
+GET  /api/v1/auth/me
+POST /api/v1/auth/logout
+```
+
+See the [authentication guide](authentication.md) for request bodies, cookie
+properties, and token validation.
 
 ## Learning path
 
@@ -78,7 +89,7 @@ Possible errors:
 ```text
 404 - lesson does not exist
 403 - prerequisite skills are incomplete
-503 - default learner is unavailable
+401 - authentication is missing or invalid
 ```
 
 ### Answer privacy

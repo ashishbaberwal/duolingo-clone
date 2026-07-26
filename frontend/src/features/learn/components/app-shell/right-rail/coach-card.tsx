@@ -1,5 +1,5 @@
+import { PipMascot } from "@/components/brand/pip-mascot";
 import styles from "../../../styles/app-shell.module.css";
-import { PipMascot } from "../../pip-mascot";
 
 export function CoachCard() {
   return (

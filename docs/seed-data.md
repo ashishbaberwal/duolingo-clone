@@ -70,6 +70,16 @@ sequences and expected pair count, use the exercise `answer_data` JSON field.
 
 The default learner has username `learner` and display name `Ava`.
 
+Local authentication:
+
+```text
+Username: learner
+Password: LingoTrail@123
+```
+
+Only the Argon2id password hash is stored in SQLite. The other four seeded
+leaderboard users have unusable password markers and cannot log in.
+
 Seeded state:
 
 - Five hearts and 500 mocked gems

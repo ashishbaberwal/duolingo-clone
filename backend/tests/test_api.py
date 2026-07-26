@@ -1,37 +1,17 @@
-import asyncio
-from collections.abc import Generator
-
-import httpx
+from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.session import get_session
-from app.main import app
 from app.models import Lesson
 from app.seed import seed_database
 
 
-def api_request(
-    session: Session,
-    method: str,
-    path: str,
-) -> httpx.Response:
-    def override_session() -> Generator[Session]:
-        yield session
-
-    async def request() -> httpx.Response:
-        transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(
-            transport=transport,
-            base_url="http://testserver",
-        ) as client:
-            return await client.request(method, path)
-
-    app.dependency_overrides[get_session] = override_session
-    try:
-        return asyncio.run(request())
-    finally:
-        app.dependency_overrides.clear()
+def login_demo(client: TestClient) -> None:
+    response = client.post(
+        "/api/v1/auth/login",
+        json={"username": "learner", "password": "LingoTrail@123"},
+    )
+    assert response.status_code == 200
 
 
 def lesson_id_by_title(session: Session, title: str) -> int:
@@ -40,10 +20,14 @@ def lesson_id_by_title(session: Session, title: str) -> int:
     return lesson_id
 
 
-def test_learning_path_returns_progress_and_unlock_states(db_session: Session) -> None:
+def test_learning_path_returns_progress_and_unlock_states(
+    db_session: Session,
+    api_client: TestClient,
+) -> None:
     seed_database(db_session)
+    login_demo(api_client)
 
-    response = api_request(db_session, "GET", "/api/v1/path")
+    response = api_client.get("/api/v1/path")
 
     assert response.status_code == 200
     body = response.json()
@@ -70,11 +54,15 @@ def test_learning_path_returns_progress_and_unlock_states(db_session: Session) -
     assert skills["Greetings"]["prerequisite_ids"] == [basics["id"]]
 
 
-def test_unlocked_lesson_hides_private_answer_data(db_session: Session) -> None:
+def test_unlocked_lesson_hides_private_answer_data(
+    db_session: Session,
+    api_client: TestClient,
+) -> None:
     seed_database(db_session)
+    login_demo(api_client)
     lesson_id = lesson_id_by_title(db_session, "Basics 2")
 
-    response = api_request(db_session, "GET", f"/api/v1/lessons/{lesson_id}")
+    response = api_client.get(f"/api/v1/lessons/{lesson_id}")
 
     assert response.status_code == 200
     body = response.json()
@@ -91,11 +79,15 @@ def test_unlocked_lesson_hides_private_answer_data(db_session: Session) -> None:
             assert "pair_key" not in option
 
 
-def test_locked_lesson_returns_forbidden(db_session: Session) -> None:
+def test_locked_lesson_returns_forbidden(
+    db_session: Session,
+    api_client: TestClient,
+) -> None:
     seed_database(db_session)
+    login_demo(api_client)
     lesson_id = lesson_id_by_title(db_session, "Greetings 1")
 
-    response = api_request(db_session, "GET", f"/api/v1/lessons/{lesson_id}")
+    response = api_client.get(f"/api/v1/lessons/{lesson_id}")
 
     assert response.status_code == 403
     assert response.json() == {
@@ -103,19 +95,27 @@ def test_locked_lesson_returns_forbidden(db_session: Session) -> None:
     }
 
 
-def test_unknown_lesson_returns_not_found(db_session: Session) -> None:
+def test_unknown_lesson_returns_not_found(
+    db_session: Session,
+    api_client: TestClient,
+) -> None:
     seed_database(db_session)
+    login_demo(api_client)
 
-    response = api_request(db_session, "GET", "/api/v1/lessons/999999")
+    response = api_client.get("/api/v1/lessons/999999")
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Lesson not found."}
 
 
-def test_profile_combines_stats_progress_and_achievements(db_session: Session) -> None:
+def test_profile_combines_stats_progress_and_achievements(
+    db_session: Session,
+    api_client: TestClient,
+) -> None:
     seed_database(db_session)
+    login_demo(api_client)
 
-    response = api_request(db_session, "GET", "/api/v1/profile")
+    response = api_client.get("/api/v1/profile")
 
     assert response.status_code == 200
     body = response.json()
@@ -131,10 +131,14 @@ def test_profile_combines_stats_progress_and_achievements(db_session: Session) -
     assert body["achievements"][0]["unlocked_at"].endswith("Z")
 
 
-def test_leaderboard_is_ranked_and_highlights_learner(db_session: Session) -> None:
+def test_leaderboard_is_ranked_and_highlights_learner(
+    db_session: Session,
+    api_client: TestClient,
+) -> None:
     seed_database(db_session)
+    login_demo(api_client)
 
-    response = api_request(db_session, "GET", "/api/v1/leaderboard")
+    response = api_client.get("/api/v1/leaderboard")
 
     assert response.status_code == 200
     body = response.json()
@@ -150,19 +154,17 @@ def test_leaderboard_is_ranked_and_highlights_learner(db_session: Session) -> No
     assert body["entries"][4]["is_current_learner"] is True
 
 
-def test_unseeded_database_returns_actionable_error(db_session: Session) -> None:
-    response = api_request(db_session, "GET", "/api/v1/path")
+def test_learning_path_requires_authentication(api_client: TestClient) -> None:
+    response = api_client.get("/api/v1/path")
 
-    assert response.status_code == 503
-    assert response.json() == {
-        "detail": "Default learner is unavailable. Run the database seed command."
-    }
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Authentication required."}
 
 
 def test_openapi_lists_public_endpoints_without_answer_fields(
-    db_session: Session,
+    api_client: TestClient,
 ) -> None:
-    response = api_request(db_session, "GET", "/openapi.json")
+    response = api_client.get("/openapi.json")
 
     assert response.status_code == 200
     document = response.json()
@@ -171,6 +173,9 @@ def test_openapi_lists_public_endpoints_without_answer_fields(
         "/api/v1/lessons/{lesson_id}",
         "/api/v1/profile",
         "/api/v1/leaderboard",
+        "/api/v1/auth/login",
+        "/api/v1/auth/logout",
+        "/api/v1/auth/me",
     }.issubset(document["paths"])
 
     lesson_schema = document["components"]["schemas"]["ExerciseResponse"]
