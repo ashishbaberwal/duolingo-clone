@@ -5,6 +5,8 @@ node_modules/
 .pnpm-store/
 coverage/
 dist/
+.playwright-cli/
+output/playwright/
 *.tsbuildinfo
 next-env.d.ts
 

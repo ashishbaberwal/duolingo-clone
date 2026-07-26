@@ -12,12 +12,14 @@ The project currently includes:
 - FastAPI backend workspace
 - One Turbo command for both applications
 - Type checking, linting, tests, and production builds
-- Typed backend health endpoint and generated OpenAPI schema
+- Responsive, API-driven learning path with interactive skill states
+- Typed query boundary with loading, retry, and failure experiences
+- Original LingoTrail visual system and Pip mascot
+- Versioned course, lesson, profile, and leaderboard APIs
 - SQLAlchemy domain model for content, progress, and lesson attempts
 - Alembic migration workflow with a reversible initial schema
 - SQLite foreign keys, uniqueness rules, and check constraints
-
-Seed content and product-facing APIs will be added in later checkpoints.
+- Idempotent Spanish course and learner-progress seed data
 
 ## Repository structure
 
@@ -143,3 +145,22 @@ Interactive OpenAPI documentation is available at
 http://localhost:8000/docs. See the [API guide](docs/api.md) and
 [ADR 003](docs/decisions/003-public-api-boundary.md) for response contracts,
 privacy rules, and architectural decisions.
+
+## Frontend
+
+The home page reads `/api/v1/path` through a typed TanStack Query hook and maps
+the response into:
+
+- desktop, tablet, and mobile navigation;
+- streak, gem, heart, and daily-goal indicators;
+- a winding unit and skill trail;
+- completed, available, and locked skill controls;
+- a next-lesson action and recoverable API error state.
+
+The interface uses local state only for the currently open skill card. Server
+data remains in the query cache, and a global state library will be introduced
+only if the lesson-session workflow proves it is needed.
+
+See the [frontend learning-path guide](docs/frontend-learning-path.md) and
+[ADR 004](docs/decisions/004-frontend-state-and-interaction.md) for component
+responsibilities, responsive behavior, and the alternatives considered.
