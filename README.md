@@ -1,11 +1,12 @@
 <div align="center">
   <img src="frontend/src/app/icon.svg" alt="LingoTrail logo" width="88" />
 
-  <h1>LingoTrail</h1>
+  <h1>LingoTrail — Language Learning Platform</h1>
 
   <p>
-    A production-deployed, Duolingo-inspired language-learning platform built
-    for the Scaler AI full-stack internship assignment.
+    A full-stack, Duolingo-inspired learning experience with secure
+    authentication, five interactive exercise formats, persistent progress,
+    gamification, and a production-ready deployment workflow.
   </p>
 
   <p>
@@ -22,7 +23,7 @@
     <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" />
     <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-Python_3.12-009688?logo=fastapi&logoColor=white" />
     <img alt="SQLite" src="https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white" />
-    <img alt="Tests" src="https://img.shields.io/badge/tests-58_passing-2EA44F" />
+    <img alt="Tests" src="https://img.shields.io/badge/tests-72_passing-2EA44F" />
     <img alt="Turborepo" src="https://img.shields.io/badge/monorepo-Turborepo-EF4444?logo=turborepo&logoColor=white" />
   </p>
 </div>
@@ -32,8 +33,10 @@
 ## Table of contents
 
 - [Try the application](#try-the-application)
+- [Assignment coverage](#assignment-coverage)
 - [Overview](#overview)
 - [Product walkthrough](#product-walkthrough)
+- [How to use LingoTrail](#how-to-use-lingotrail)
 - [Key features](#key-features)
 - [Technology stack](#technology-stack)
 - [System architecture](#system-architecture)
@@ -62,6 +65,19 @@ There is no shared default learner. Every evaluator creates an independent
 account whose password is stored only as an Argon2id hash. XP, hearts, streak,
 skill progress, attempts, achievements, and leaderboard rank then follow that
 authenticated user.
+
+## Assignment coverage
+
+| Evaluation area | Implementation |
+| --- | --- |
+| Learning path | Ordered units and skills with completed, available, and locked states, progress rings, crowns, and prerequisite-based unlocking |
+| Lesson experience | Multiple choice, word bank, match pairs, fill-in-the-blank, and typed-answer exercises with immediate server-validated feedback |
+| Gamification | Persistent hearts, XP, streaks, daily goal, gems, crowns, leaderboard position, and achievement-ready profile data |
+| Persistence | Learner accounts, lesson attempts, answers, daily activity, skill progress, and rankings stored in a relational SQLite schema |
+| Authentication | Independent signup and login, Argon2id password hashes, signed sessions, and Secure HttpOnly cookie support |
+| Product UI | Original LingoTrail identity, Pip mascot, animated outcomes, completion celebration, placeholders, and responsive styling |
+| Engineering quality | Feature-based frontend, layered backend, migrations, seed service, typed contracts, error states, and a single Turborepo quality gate |
+| Delivery | Vercel frontend, DigitalOcean backend, Caddy HTTPS, systemd supervision, GitHub Actions deployment, and operational documentation |
 
 ## Overview
 
@@ -112,6 +128,21 @@ daily-goal progress, and earned achievements.
 
 ![LingoTrail learner profile](docs/assets/profile.jpg)
 
+## How to use LingoTrail
+
+1. Create an account with a unique username and email address.
+2. Sign in with the credentials used during registration.
+3. Open the first available skill on the learning path.
+4. Complete each exercise and use the immediate feedback to continue.
+5. Preserve hearts by answering carefully or use the mocked refill after
+   running out.
+6. Finish lessons to earn XP, update the daily streak, and unlock later skills.
+7. Review learner-specific statistics on the profile and compare XP on the
+   leaderboard.
+
+Progress belongs to the authenticated account, so signing in as another learner
+produces a separate path, heart balance, streak, attempt history, and rank.
+
 ## Key features
 
 ### Learning experience
@@ -137,7 +168,7 @@ daily-goal progress, and earned achievements.
 - Daily XP goal
 - Gems and crowns
 - Seeded league leaderboard
-- Achievement and badge system
+- Achievement definitions, profile badge UI, and learner-achievement schema
 
 ### Product quality
 
@@ -610,7 +641,7 @@ backend/.env
   FRONTEND_ORIGIN
   DATABASE_URL
   AUTH_SECRET_KEY
-  cookie and demo-user settings
+  cookie and token settings
 ```
 
 Actual `.env` files are ignored by Git. Only `.env.example` templates are
@@ -908,7 +939,7 @@ server-only proxy variable.
 4. Add CSRF tokens and session revocation.
 5. Move secrets into a managed secret store.
 6. Add structured logs, traces, metrics, and alerting.
-7. Add GitHub Actions for pull-request quality gates and deployment promotion.
+7. Add pull-request CI, protected deployment approvals, and rollback automation.
 8. Store audio and media in object storage behind a CDN.
 
 ### Database migration path
