@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     app_name: str = "LingoTrail API"
     app_env: str = "development"
     frontend_origin: str = "http://localhost:3000"
+    database_url: str = "sqlite:///./data/lingotrail.db"
+    database_echo: bool = False
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

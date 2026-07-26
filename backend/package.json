@@ -6,7 +6,7 @@
     "dev": "uv run uvicorn app.main:app --reload --port 8000",
     "build": "uv build --out-dir dist",
     "lint": "uv run ruff check .",
-    "check-types": "uv run mypy app",
+    "check-types": "uv run mypy app tests",
     "test": "uv run pytest"
   }
 }

@@ -6,15 +6,18 @@ as a Turborepo monorepo with a Next.js frontend and a FastAPI backend.
 
 ## Current status
 
-Checkpoint 1 establishes and verifies the project foundation:
+The project currently includes:
 
 - Next.js frontend workspace
 - FastAPI backend workspace
 - One Turbo command for both applications
 - Type checking, linting, tests, and production builds
 - Typed backend health endpoint and generated OpenAPI schema
+- SQLAlchemy domain model for content, progress, and lesson attempts
+- Alembic migration workflow with a reversible initial schema
+- SQLite foreign keys, uniqueness rules, and check constraints
 
-Product features and the SQLite domain model will be added in later checkpoints.
+Seed content and product-facing APIs will be added in later checkpoints.
 
 ## Repository structure
 
@@ -43,6 +46,7 @@ The committed lockfiles make dependency installation reproducible.
 pnpm install
 cd backend
 uv sync
+uv run alembic upgrade head
 cd ..
 ```
 
@@ -86,3 +90,25 @@ for its application code.
 
 See [ADR 001](docs/decisions/001-monorepo-and-tooling.md) for the complete
 decision and alternatives.
+
+## Database workflow
+
+The application uses SQLAlchemy models as the domain definition and Alembic
+migrations as the database change history.
+
+```bash
+cd backend
+
+# Bring a new or existing database to the latest schema.
+uv run alembic upgrade head
+
+# Check whether models and migrations have drifted apart.
+uv run alembic check
+
+# Reverse the most recent migration.
+uv run alembic downgrade -1
+```
+
+The local SQLite file is generated under `backend/data/` and is intentionally
+not committed. See the [database schema guide](docs/database-schema.md) and
+[ADR 002](docs/decisions/002-relational-domain-model.md).
