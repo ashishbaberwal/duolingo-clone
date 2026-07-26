@@ -13,7 +13,7 @@ repository and is covered by automated or desktop-browser validation.
 | SQLite with a designed schema | Complete | `backend/app/models`, Alembic migration, `docs/database-schema.md` |
 | Public repository with `frontend/` and `backend/` | Complete | Public `ashishbaberwal/duolingo-clone` GitHub repository |
 | README setup, stack, architecture, schema, API, assumptions | Complete | Root `README.md` and linked detailed guides |
-| Hosted working demo | Prepared | Vercel project and Render Blueprint are ready; paid persistent backend approval remains |
+| Hosted working demo | Prepared | Vercel project and DigitalOcean Droplet configuration are ready; cloud authentication and a backend domain remain |
 
 ## 1. Learning path and skill tree
 

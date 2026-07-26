@@ -10,50 +10,105 @@ Vercel - Next.js frontend
   |
   | same-origin /api rewrite
   v
-Render - FastAPI container
+DigitalOcean Droplet - Caddy HTTPS proxy
   |
   v
-Render persistent disk - SQLite database
+FastAPI container -> host-mounted SQLite database
 ```
 
-The browser never calls the Render hostname directly. Next.js rewrites `/api/*`
-to `API_PROXY_TARGET`, which keeps the authentication cookie first-party on the
-Vercel hostname. Local development continues to call
+The browser never calls the DigitalOcean hostname directly. Next.js rewrites
+`/api/*` to `API_PROXY_TARGET`, which keeps the authentication cookie
+first-party on the Vercel hostname. Local development continues to call
 `NEXT_PUBLIC_API_URL=http://localhost:8000` directly.
 
-## Why the backend needs a persistent disk
+## Why a Droplet instead of App Platform
 
-Render web services use an ephemeral filesystem by default. LingoTrail persists
-XP, streaks, hearts, lesson attempts, and skill progress in SQLite, so the
-database must live at `/var/data/lingotrail.db` on an attached disk. Only one
-backend instance can mount this disk, which is appropriate for the assignment's
-small demo workload.
-
-The committed `render.yaml` therefore requests a Starter web service and a 1 GB
-persistent disk. This is a paid resource. Do not create the Blueprint until the
-repository owner approves the current Render charge.
+DigitalOcean App Platform containers have an ephemeral filesystem and do not
+support volumes. Deployments or container replacements would delete SQLite
+learner progress. LingoTrail therefore uses one Droplet with
+`/var/lib/lingotrail` mounted into the API container at `/var/data`.
 
 References:
 
-- [Render persistent disks](https://render.com/docs/disks)
-- [Render Blueprint specification](https://render.com/docs/blueprint-spec)
+- [DigitalOcean App Platform storage limits](https://docs.digitalocean.com/products/app-platform/details/limits/)
+- [DigitalOcean Droplet features](https://docs.digitalocean.com/products/droplets/details/features/)
 - [Vercel monorepo deployments](https://vercel.com/docs/monorepos)
 
-## Backend deployment
+## Deployment files
 
-1. In Render, create a Blueprint from the public GitHub repository.
-2. Render detects the root `render.yaml`.
-3. Confirm the paid `starter` service and 1 GB disk.
-4. Set `FRONTEND_ORIGIN` to the final Vercel origin, without a trailing slash:
+```text
+backend/Dockerfile
+deploy/digitalocean/compose.yaml
+deploy/digitalocean/Caddyfile
+deploy/digitalocean/.env.example
+```
 
-   ```text
-   https://lingotrail-scaler.vercel.app
-   ```
+Docker Compose runs:
 
-5. Render generates `AUTH_SECRET_KEY`; never copy that value into source code.
-6. Deploy the Blueprint.
+- `api`: FastAPI, Alembic migrations, idempotent seed data, and Uvicorn;
+- `caddy`: HTTPS certificate automation and reverse proxying;
+- `caddy_data`: persistent certificate data;
+- `caddy_config`: persistent Caddy runtime configuration.
 
-Container startup runs these steps in order:
+The SQLite file is outside Docker-managed storage at:
+
+```text
+/var/lib/lingotrail/lingotrail.db
+```
+
+Rebuilding or replacing containers does not remove this host directory.
+
+## Prerequisites
+
+Before creating the Droplet:
+
+1. Authenticate the DigitalOcean CLI or sign in to the control panel.
+2. Choose a Droplet region close to the evaluator.
+3. Create an Ubuntu Droplet with Docker installed.
+4. Add an SSH key; do not enable password-only administration.
+5. Allow inbound SSH, HTTP, and HTTPS through a DigitalOcean Cloud Firewall.
+6. Point a backend DNS record, such as `api.example.com`, to the Droplet.
+
+Caddy requires the DNS record to resolve before it can obtain the HTTPS
+certificate.
+
+## Droplet setup
+
+Clone the public repository and create the persistent directory:
+
+```bash
+git clone https://github.com/ashishbaberwal/duolingo-clone.git
+cd duolingo-clone
+sudo install -d -m 750 -o root -g docker /var/lib/lingotrail
+cp deploy/digitalocean/.env.example deploy/digitalocean/.env
+```
+
+Generate a production secret on the Droplet:
+
+```bash
+openssl rand -base64 48
+```
+
+Edit `deploy/digitalocean/.env`:
+
+```text
+API_DOMAIN=api.your-domain.example
+FRONTEND_ORIGIN=https://lingotrail-scaler.vercel.app
+AUTH_SECRET_KEY=<generated value>
+```
+
+The `.env` file is ignored by Git and must remain only on the server.
+
+Start the services:
+
+```bash
+docker compose \
+  --env-file deploy/digitalocean/.env \
+  -f deploy/digitalocean/compose.yaml \
+  up -d --build
+```
+
+Container startup runs these API steps in order:
 
 ```text
 alembic upgrade head
@@ -61,31 +116,22 @@ python -m app.seed
 uvicorn app.main:app --host 0.0.0.0 --port $PORT
 ```
 
-Migrations are repeatable, and seeding is idempotent, so normal redeploys do not
-duplicate content or overwrite learner progress. Render checks
-`/api/v1/health`.
-
-Record the resulting backend origin, for example:
-
-```text
-https://lingotrail-api.onrender.com
-```
+Migrations are repeatable, and seeding is idempotent, so redeploys do not
+duplicate content or overwrite learner progress.
 
 ## Frontend deployment
 
 The local `frontend/` directory is linked to the Vercel project
 `ashishbaberwal/lingotrail-scaler`.
 
-Add this server-only environment variable to Production, Preview, and
-Development in Vercel:
+Add this server-only variable to Production, Preview, and Development:
 
 ```text
-API_PROXY_TARGET=https://your-render-backend.onrender.com
+API_PROXY_TARGET=https://api.your-domain.example
 ```
 
 Do not add `NEXT_PUBLIC_API_URL` in Vercel. Its absence makes browser requests
-same-origin. `NEXT_PUBLIC_AUTH_COOKIE_NAME` is optional because the committed
-default already matches the backend.
+same-origin.
 
 Deploy from the repository root:
 
@@ -93,26 +139,72 @@ Deploy from the repository root:
 vercel --cwd frontend --prod
 ```
 
+## Updating the backend
+
+On the Droplet:
+
+```bash
+cd duolingo-clone
+git pull --ff-only origin main
+docker compose \
+  --env-file deploy/digitalocean/.env \
+  -f deploy/digitalocean/compose.yaml \
+  up -d --build
+```
+
+Check deployment state:
+
+```bash
+docker compose \
+  --env-file deploy/digitalocean/.env \
+  -f deploy/digitalocean/compose.yaml \
+  ps
+docker compose \
+  --env-file deploy/digitalocean/.env \
+  -f deploy/digitalocean/compose.yaml \
+  logs --tail=100 api
+```
+
+## Backup and restore
+
+Create a consistent SQLite backup without stopping the API:
+
+```bash
+docker compose \
+  --env-file deploy/digitalocean/.env \
+  -f deploy/digitalocean/compose.yaml \
+  exec api python -c \
+  'import sqlite3; source=sqlite3.connect("/var/data/lingotrail.db"); backup=sqlite3.connect("/var/data/lingotrail-backup.db"); source.backup(backup); backup.close(); source.close()'
+```
+
+Copy backups off the Droplet or attach DigitalOcean Block Storage with a
+snapshot policy before treating the demo as long-lived production.
+
+For restoration:
+
+1. stop the API container;
+2. retain the current database as a recovery copy;
+3. restore a verified backup to `/var/lib/lingotrail/lingotrail.db`;
+4. start the services and run the smoke test.
+
+Never overwrite the live database while the API is running.
+
 ## Production smoke test
 
 1. Open `https://lingotrail-scaler.vercel.app/login`.
 2. Sign in with `learner` / `LingoTrail@123`.
-3. Confirm the learning path and learner stats load.
+3. Confirm the learning path and stats load.
 4. Complete a lesson and record the XP total.
-5. Reload the page and confirm XP and path progress persist.
+5. Reload and confirm XP and path progress persist.
 6. Open Profile and Leaderboards.
-7. Redeploy the backend and verify the recorded XP still exists.
-8. Check the browser console for errors and warnings.
-9. Check the Render health endpoint directly.
+7. Rebuild the backend containers and verify the XP still exists.
+8. Check both browser and container logs for errors.
+9. Check `https://api.your-domain.example/api/v1/health`.
 
-## Rollback and recovery
+## Rollback
 
 - Frontend: promote a previous Vercel deployment.
-- Backend code: use Render's rollback/redeploy control for a previous commit.
-- Schema: use an explicit tested Alembic downgrade only when the migration is
-  designed to be reversible.
-- Data: Render persistent disks have snapshots; restore a snapshot for database
-  recovery instead of deleting or replacing the live SQLite file.
-
-Never run destructive SQLite commands or replace `/var/data/lingotrail.db`
-during routine deployment.
+- Backend: check out the previous known-good commit and rebuild the containers.
+- Schema: use a tested Alembic downgrade only when the migration explicitly
+  supports it.
+- Data: restore a verified off-server SQLite backup or volume snapshot.
