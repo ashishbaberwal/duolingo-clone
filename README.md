@@ -189,6 +189,19 @@ Password: LingoTrail@123
 
 The password is local demo data. SQLite stores only its Argon2id hash.
 
+## Deployment
+
+Production is prepared for a Vercel Next.js frontend and a Render FastAPI
+container with a persistent SQLite disk. Vercel proxies same-origin `/api`
+requests to FastAPI, keeping the HttpOnly session cookie first-party.
+
+The frontend Vercel project is `ashishbaberwal/lingotrail-scaler`. The Render
+Blueprint is committed but intentionally not created until the repository owner
+approves the paid Starter service and persistent disk.
+
+See [docs/deployment.md](docs/deployment.md) for environment variables, startup
+order, smoke tests, persistence verification, and rollback steps.
+
 ## Quality checks
 
 Run the complete local quality gate:

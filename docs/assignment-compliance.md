@@ -13,7 +13,7 @@ repository and is covered by automated or desktop-browser validation.
 | SQLite with a designed schema | Complete | `backend/app/models`, Alembic migration, `docs/database-schema.md` |
 | Public repository with `frontend/` and `backend/` | Complete | Public `ashishbaberwal/duolingo-clone` GitHub repository |
 | README setup, stack, architecture, schema, API, assumptions | Complete | Root `README.md` and linked detailed guides |
-| Hosted working demo | Pending | Requires a public frontend and backend deployment URL |
+| Hosted working demo | Prepared | Vercel project and Render Blueprint are ready; paid persistent backend approval remains |
 
 ## 1. Learning path and skill tree
 
@@ -107,7 +107,8 @@ Audio, timed challenges, and dark mode remain optional and are not implemented.
 ## Remaining submission blocker
 
 The repository is public and source documentation is complete. The only missing
-assignment deliverable is a hosted working URL. Deployment must include:
+assignment deliverable is a hosted working URL. Infrastructure configuration is
+ready, and final deployment must include:
 
 1. a persistent production backend and database;
 2. production CORS, cookie, and secret configuration;
