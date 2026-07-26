@@ -2,8 +2,9 @@
 
 import type { ReactNode } from "react";
 import type { LearnerStats } from "@/lib/api/types";
-import styles from "../../styles/app-shell.module.css";
+import styles from "./app-shell.module.css";
 import { MobileNavigation } from "./mobile-navigation";
+import type { AppSection } from "./navigation";
 import { RightRail } from "./right-rail/right-rail";
 import { Sidebar } from "./sidebar";
 import { StatsBar } from "./stats-bar";
@@ -11,18 +12,23 @@ import { StatsBar } from "./stats-bar";
 interface AppShellProps {
   stats: LearnerStats;
   children: ReactNode;
+  activeSection?: AppSection;
 }
 
-export function AppShell({ stats, children }: AppShellProps) {
+export function AppShell({
+  stats,
+  children,
+  activeSection = "learn",
+}: AppShellProps) {
   return (
     <div className={styles.appShell}>
-      <Sidebar />
+      <Sidebar activeSection={activeSection} />
       <div className={styles.centerColumn}>
         <StatsBar stats={stats} />
         <main className={styles.mainContent}>{children}</main>
       </div>
       <RightRail stats={stats} />
-      <MobileNavigation />
+      <MobileNavigation activeSection={activeSection} />
     </div>
   );
 }

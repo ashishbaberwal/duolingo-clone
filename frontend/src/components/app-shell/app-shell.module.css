@@ -110,6 +110,7 @@
   font-size: 15px;
   font-weight: 950;
   letter-spacing: 0.025em;
+  text-decoration: none;
   text-align: left;
   text-transform: uppercase;
   transition:
@@ -564,7 +565,8 @@
     z-index: 100;
   }
 
-  .mobileNav button {
+  .mobileNav button,
+  .mobileNav a {
     min-width: 0;
     display: grid;
     place-items: center;
@@ -576,10 +578,12 @@
     background: transparent;
     font-size: 9px;
     font-weight: 1000;
+    text-decoration: none;
     text-transform: uppercase;
   }
 
-  .mobileNav button svg {
+  .mobileNav button svg,
+  .mobileNav a svg {
     width: 25px;
     height: 25px;
   }

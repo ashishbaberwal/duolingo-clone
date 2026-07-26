@@ -2,31 +2,10 @@ import {
   Apple,
   BookOpen,
   Hand,
-  Home,
-  MoreHorizontal,
   Plane,
-  ShoppingBag,
-  Target,
-  Trophy,
-  UserRound,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-
-export interface NavigationItem {
-  label: string;
-  icon: LucideIcon;
-  active?: boolean;
-}
-
-export const NAVIGATION_ITEMS: readonly NavigationItem[] = [
-  { label: "Learn", icon: Home, active: true },
-  { label: "Leaderboards", icon: Trophy },
-  { label: "Quests", icon: Target },
-  { label: "Shop", icon: ShoppingBag },
-  { label: "Profile", icon: UserRound },
-  { label: "More", icon: MoreHorizontal },
-];
 
 export const SKILL_ICONS: Readonly<Record<string, LucideIcon>> = {
   "book-open": BookOpen,

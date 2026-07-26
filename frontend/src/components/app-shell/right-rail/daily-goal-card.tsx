@@ -1,6 +1,6 @@
 import { Target } from "lucide-react";
 import type { LearnerStats } from "@/lib/api/types";
-import styles from "../../../styles/app-shell.module.css";
+import styles from "../app-shell.module.css";
 
 interface DailyGoalCardProps {
   stats: LearnerStats;

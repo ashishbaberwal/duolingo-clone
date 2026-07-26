@@ -1,7 +1,7 @@
 "use client";
 
 import { useLearningPath } from "@/lib/api/queries";
-import { AppShell } from "./app-shell/app-shell";
+import { AppShell } from "@/components/app-shell";
 import { LearningPath } from "./learning-path/learning-path";
 import { ErrorState } from "./page-states/error-state";
 import { LoadingState } from "./page-states/loading-state";

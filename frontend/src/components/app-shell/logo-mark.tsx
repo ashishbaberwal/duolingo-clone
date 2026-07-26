@@ -1,4 +1,4 @@
-import styles from "../../styles/app-shell.module.css";
+import styles from "./app-shell.module.css";
 
 export function LogoMark() {
   return (

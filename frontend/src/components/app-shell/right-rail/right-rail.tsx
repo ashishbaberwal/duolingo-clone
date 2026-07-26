@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
 import type { LearnerStats } from "@/lib/api/types";
-import styles from "../../../styles/app-shell.module.css";
+import styles from "../app-shell.module.css";
 import { CoachCard } from "./coach-card";
 import { DailyGoalCard } from "./daily-goal-card";
 import { LeagueCard } from "./league-card";
