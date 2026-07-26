@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { LogoutButton } from "@/features/auth";
 import styles from "./app-shell.module.css";
 import { MOBILE_NAVIGATION_ITEMS, type AppSection } from "./navigation";
@@ -43,6 +44,7 @@ export function MobileNavigation({
           </button>
         );
       })}
+      <ThemeToggle className={styles.mobileThemeToggle} />
       <LogoutButton className={styles.mobileLogout} />
     </nav>
   );

@@ -14,7 +14,7 @@
   min-height: 92px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 52px 1fr 72px;
+  grid-template-columns: 52px 1fr 72px 48px;
   align-items: center;
   gap: 22px;
 }
@@ -90,6 +90,10 @@
 
 .hearts strong {
   min-width: 18px;
+}
+
+.lessonThemeToggle {
+  margin-left: 2px;
 }
 
 .lessonContext {
@@ -420,6 +424,98 @@
   width: 18px;
 }
 
+:global(html[data-theme="dark"]) .lessonScreen {
+  background:
+    radial-gradient(circle at 12% 24%, rgb(120 223 59 / 5%), transparent 25%),
+    radial-gradient(circle at 88% 65%, rgb(85 201 255 / 5%), transparent 28%),
+    var(--canvas);
+}
+
+:global(html[data-theme="dark"]) .leaveLesson {
+  color: #829087;
+}
+
+:global(html[data-theme="dark"]) .leaveLesson:hover {
+  color: var(--ink);
+  background: #26362c;
+}
+
+:global(html[data-theme="dark"]) .progressTrack {
+  background: #34443a;
+}
+
+:global(html[data-theme="dark"]) .lessonContext {
+  color: #8e9b92;
+}
+
+:global(html[data-theme="dark"]) .lessonContext span::after {
+  color: #506057;
+}
+
+:global(html[data-theme="dark"]) .exerciseCopy > span {
+  color: #b0bcb1;
+}
+
+:global(html[data-theme="dark"]) .exerciseCopy h1 {
+  color: var(--ink);
+}
+
+:global(html[data-theme="dark"]) .coachNote {
+  border-color: var(--line);
+  color: #9ead9f;
+  background: var(--paper-raised);
+}
+
+:global(html[data-theme="dark"]) .actionBar {
+  background: var(--glass-strong);
+}
+
+:global(html[data-theme="dark"]) .keyboardHint {
+  color: #829087;
+}
+
+:global(html[data-theme="dark"]) .checkButton:disabled {
+  color: #829087;
+  background: #35443a;
+  box-shadow: 0 5px 0 #202d25;
+}
+
+:global(html[data-theme="dark"]) .feedbackCorrect {
+  color: #b0ef8c;
+  background: #213d22;
+}
+
+:global(html[data-theme="dark"]) .feedbackWrong {
+  color: #ffaaaa;
+  background: #422526;
+}
+
+:global(html[data-theme="dark"]) .feedbackIcon {
+  background: rgb(12 21 16 / 48%);
+}
+
+:global(html[data-theme="dark"]) .submissionError {
+  border-color: #844647;
+  color: #ffb0b0;
+  background: #3c2425;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 24%);
+}
+
+:global(html[data-theme="dark"]) .lessonState {
+  background:
+    radial-gradient(circle at 50% 35%, #1a301d, transparent 32%),
+    var(--canvas);
+}
+
+:global(html[data-theme="dark"]) .lessonState p {
+  color: var(--muted);
+}
+
+:global(html[data-theme="dark"]) .errorActions a {
+  color: var(--ink);
+  background: var(--paper-raised);
+}
+
 @keyframes trailBounce {
   to {
     transform: translateY(-12px);
@@ -434,7 +530,7 @@
 
   .lessonHeader {
     min-height: 76px;
-    grid-template-columns: 40px 1fr 54px;
+    grid-template-columns: 40px 1fr 54px 42px;
     gap: 12px;
   }
 

@@ -41,3 +41,19 @@ class IntersectionObserverMock implements IntersectionObserver {
 }
 
 vi.stubGlobal("IntersectionObserver", IntersectionObserverMock);
+
+vi.stubGlobal(
+  "matchMedia",
+  vi.fn(
+    (query: string): MediaQueryList => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }),
+  ),
+);

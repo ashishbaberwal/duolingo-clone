@@ -89,6 +89,12 @@
   width: 18px;
 }
 
+:global(html[data-theme="dark"]) .loadingCard,
+:global(html[data-theme="dark"]) .errorCard {
+  background: var(--paper-raised);
+  box-shadow: 0 7px 0 var(--theme-shadow);
+}
+
 @keyframes bounce {
   to {
     transform: translateY(-8px);

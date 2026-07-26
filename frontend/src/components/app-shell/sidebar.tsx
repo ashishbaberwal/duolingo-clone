@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PipMascot } from "@/components/brand/pip-mascot";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { LogoutButton } from "@/features/auth";
 import styles from "./app-shell.module.css";
 import { LogoMark } from "./logo-mark";
@@ -53,6 +54,7 @@ export function Sidebar({
           );
         })}
       </nav>
+      <ThemeToggle className={styles.sidebarThemeToggle} showLabel />
       <div className={styles.sidebarFooter}>
         <PipMascot className={styles.sidebarMascot} mood="focused" />
         <div className={styles.sidebarFooterContent}>

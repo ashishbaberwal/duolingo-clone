@@ -6,6 +6,7 @@
   --leaf-pale: #d7ffb8;
   --sky: #1cb0f6;
   --sky-deep: #1689c1;
+  --sky-pale: #e7f8ff;
   --sun: #ffc800;
   --sun-deep: #d89e00;
   --heart: #ff4b4b;
@@ -17,6 +18,38 @@
   --soft-line: #eeeeee;
   --paper: #ffffff;
   --canvas: #fbfcf7;
+  --paper-raised: #ffffff;
+  --paper-soft: #f7f9f5;
+  --theme-shadow: #dedede;
+  --glass: rgb(255 255 255 / 92%);
+  --glass-strong: rgb(255 255 255 / 96%);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --leaf: #78df3b;
+  --leaf-deep: #4ba51d;
+  --leaf-pale: #243e22;
+  --sky: #55c9ff;
+  --sky-deep: #39aadd;
+  --sky-pale: #172f3a;
+  --sun: #ffd84a;
+  --sun-deep: #b98900;
+  --heart: #ff7070;
+  --heart-deep: #c94747;
+  --gem: #55dfce;
+  --ink: #edf5e9;
+  --muted: #a8b5a7;
+  --line: #35463a;
+  --soft-line: #27372d;
+  --paper: #17231b;
+  --canvas: #0c1510;
+  --paper-raised: #1d2b21;
+  --paper-soft: #121e17;
+  --theme-shadow: #0a110d;
+  --glass: rgb(23 35 27 / 90%);
+  --glass-strong: rgb(18 30 23 / 96%);
+  color-scheme: dark;
 }
 
 * {
@@ -35,6 +68,9 @@ body {
   background: var(--canvas);
   font-family: "Nunito Variable", "Avenir Next Rounded", sans-serif;
   font-synthesis: none;
+  transition:
+    color 180ms ease,
+    background-color 180ms ease;
 }
 
 button,
@@ -56,6 +92,11 @@ button {
 ::selection {
   color: #245200;
   background: var(--leaf-pale);
+}
+
+:root[data-theme="dark"] ::selection {
+  color: #efffe5;
+  background: #315f25;
 }
 
 :focus-visible {

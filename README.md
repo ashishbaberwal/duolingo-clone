@@ -23,7 +23,7 @@
     <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" />
     <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-Python_3.12-009688?logo=fastapi&logoColor=white" />
     <img alt="SQLite" src="https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white" />
-    <img alt="Tests" src="https://img.shields.io/badge/tests-73_passing-2EA44F" />
+    <img alt="Tests" src="https://img.shields.io/badge/tests-74_passing-2EA44F" />
     <img alt="Turborepo" src="https://img.shields.io/badge/monorepo-Turborepo-EF4444?logo=turborepo&logoColor=white" />
   </p>
 </div>
@@ -174,6 +174,7 @@ produces a separate path, heart balance, streak, attempt history, and rank.
 ### Product quality
 
 - Original LingoTrail identity and Pip mascot
+- Persistent light and dark themes with operating-system preference fallback
 - Modular feature-based frontend structure
 - Responsive desktop, tablet, and mobile CSS
 - Accessible labels, navigation, feedback, and progress indicators
@@ -946,6 +947,16 @@ server-only proxy variable.
 - failed attempts and unusual answer traffic;
 - Caddy certificate renewal;
 - Vercel deployment and rewrite failures.
+
+### 18. How does dark mode avoid flashing the wrong theme?
+
+The learner's explicit choice is stored in `localStorage`. Before React
+hydrates, a small script in the root layout reads that preference or falls back
+to `prefers-color-scheme`, then sets `data-theme` and `color-scheme` on the
+document root. CSS variables and feature-scoped dark overrides render the
+correct palette on the first paint. The reusable toggle updates the document
+and persisted preference together, while an unpinned preference continues to
+follow operating-system theme changes.
 
 ## Scaling beyond the assignment
 

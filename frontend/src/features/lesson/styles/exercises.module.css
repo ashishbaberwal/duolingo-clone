@@ -310,6 +310,91 @@
   font-weight: 650;
 }
 
+:global(html[data-theme="dark"]) .choiceCard,
+:global(html[data-theme="dark"]) .tokenTray button,
+:global(html[data-theme="dark"]) .matchGrid button,
+:global(html[data-theme="dark"]) .textAnswer input {
+  border-color: var(--line);
+  color: var(--ink);
+  background: var(--paper-raised);
+  box-shadow: 0 5px 0 var(--theme-shadow);
+}
+
+:global(html[data-theme="dark"]) .choiceCard:hover:not(:disabled),
+:global(html[data-theme="dark"]) .matchGrid button:hover:not(:disabled) {
+  border-color: #3d8caf;
+  color: var(--sky);
+  background: var(--sky-pale);
+  box-shadow: 0 5px 0 #285f77;
+}
+
+:global(html[data-theme="dark"]) .choiceKey {
+  border-color: var(--line);
+  color: #9aa89d;
+  background: #2a3930;
+}
+
+:global(html[data-theme="dark"]) .choiceSelected,
+:global(html[data-theme="dark"]) .matchGrid .matchSelected,
+:global(html[data-theme="dark"]) .sentenceBuilder button {
+  border-color: var(--sky);
+  color: var(--sky);
+  background: var(--sky-pale);
+  box-shadow: 0 5px 0 var(--sky-deep);
+}
+
+:global(html[data-theme="dark"]) .sentenceBuilder {
+  background:
+    linear-gradient(var(--canvas), var(--canvas)) padding-box,
+    repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 51px,
+        var(--line) 52px,
+        var(--line) 54px
+      )
+      border-box;
+  border-color: var(--line);
+}
+
+:global(html[data-theme="dark"]) .sentenceHint,
+:global(html[data-theme="dark"]) .matchHint,
+:global(html[data-theme="dark"]) .textAnswer > p {
+  color: #8d9b91;
+}
+
+:global(html[data-theme="dark"]) .tokenTray button:disabled {
+  color: transparent;
+  border-color: var(--soft-line);
+  background: #202e25;
+  box-shadow: 0 4px 0 #111b15;
+}
+
+:global(html[data-theme="dark"]) .matchGrid .matchPaired {
+  border-color: #4f8e3c;
+  color: #a8e887;
+  background: #203a21;
+  box-shadow: 0 4px 0 #315c2a;
+}
+
+:global(html[data-theme="dark"]) .blankPrompt {
+  color: var(--ink);
+  background: var(--paper-raised);
+}
+
+:global(html[data-theme="dark"]) .textAnswer label > span {
+  color: #b0bcb1;
+}
+
+:global(html[data-theme="dark"]) .textAnswer input:focus {
+  border-color: var(--sky);
+  box-shadow: 0 4px 0 var(--sky-deep);
+}
+
+:global(html[data-theme="dark"]) .textAnswer input::placeholder {
+  color: #738078;
+}
+
 @media (max-width: 640px) {
   .choiceGrid {
     margin-top: 26px;

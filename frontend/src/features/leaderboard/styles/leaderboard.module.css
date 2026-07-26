@@ -283,6 +283,62 @@
   color: var(--sky);
 }
 
+:global(html[data-theme="dark"]) .hero {
+  border-color: #765333;
+  background:
+    radial-gradient(circle at 88% 5%, rgb(255 255 255 / 6%), transparent 30%),
+    linear-gradient(125deg, #35271d, #251f1a);
+  box-shadow: 0 6px 0 #17110d;
+}
+
+:global(html[data-theme="dark"]) .hero > div:nth-child(2) > span,
+:global(html[data-theme="dark"]) .sectionHeading span {
+  color: #dda15f;
+}
+
+:global(html[data-theme="dark"]) .hero p {
+  color: #c5aa92;
+}
+
+:global(html[data-theme="dark"]) .rankCallout {
+  border-color: #6d4e35;
+  color: #f0b878;
+  background: rgb(23 35 27 / 68%);
+}
+
+:global(html[data-theme="dark"]) .podium {
+  background:
+    radial-gradient(circle at 50% 20%, rgb(255 216 74 / 10%), transparent 28%),
+    linear-gradient(180deg, var(--paper-raised), var(--paper-soft));
+  box-shadow: 0 5px 0 var(--theme-shadow);
+}
+
+:global(html[data-theme="dark"]) .sectionHeading p,
+:global(html[data-theme="dark"]) .rankNumber,
+:global(html[data-theme="dark"]) .learnerName small {
+  color: #8d9a91;
+}
+
+:global(html[data-theme="dark"]) .rankingList li {
+  background: var(--paper-raised);
+  box-shadow: 0 3px 0 var(--theme-shadow);
+}
+
+:global(html[data-theme="dark"]) .rankingList .currentRow {
+  border-color: #307896;
+  background: #172f3a;
+  box-shadow: 0 3px 0 #10212a;
+}
+
+:global(html[data-theme="dark"]) .learnerName strong span {
+  color: var(--sky);
+  background: var(--sky-pale);
+}
+
+:global(html[data-theme="dark"]) .xp {
+  color: #f4d768;
+}
+
 @media (max-width: 650px) {
   .hero {
     align-items: flex-start;

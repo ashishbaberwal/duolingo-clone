@@ -150,12 +150,19 @@
   min-height: 116px;
   display: flex;
   align-items: center;
-  margin-top: auto;
+  margin-top: 12px;
   padding: 14px 10px 10px 90px;
   border: 2px solid #d7ffb8;
   border-radius: 22px;
   color: #397b08;
   background: #f1ffe5;
+}
+
+.sidebarThemeToggle {
+  width: calc(100% - 8px);
+  justify-content: flex-start;
+  margin: auto 4px 0;
+  padding-inline: 17px;
 }
 
 .sidebarFooter p {
@@ -560,6 +567,100 @@
   width: 17px;
 }
 
+:global(html[data-theme="dark"]) .navItem {
+  color: #a9b6aa;
+}
+
+:global(html[data-theme="dark"]) .navItem:hover {
+  color: var(--ink);
+  background: #213127;
+}
+
+:global(html[data-theme="dark"]) .navItemActive {
+  border-color: #2f7593;
+  color: var(--sky);
+  background: #17303b;
+}
+
+:global(html[data-theme="dark"]) .soonDot {
+  background: #526157;
+}
+
+:global(html[data-theme="dark"]) .sidebarFooter {
+  border-color: #365d2d;
+  color: #a6e883;
+  background: #1e3420;
+}
+
+:global(html[data-theme="dark"]) .sidebarLogout {
+  color: #83a474;
+}
+
+:global(html[data-theme="dark"]) .statsBar {
+  background: var(--glass);
+}
+
+:global(html[data-theme="dark"]) .railUtility {
+  color: #819085;
+}
+
+:global(html[data-theme="dark"]) .railUtility button,
+:global(html[data-theme="dark"]) .sideCard,
+:global(html[data-theme="dark"]) .comingSoonToast {
+  background: var(--paper-raised);
+  box-shadow: 0 4px 0 var(--theme-shadow);
+}
+
+:global(html[data-theme="dark"]) .cardEyebrow,
+:global(html[data-theme="dark"]) .legal {
+  color: #77867b;
+}
+
+:global(html[data-theme="dark"]) .goalBadge {
+  color: #ffdf71;
+  background: #3b331a;
+}
+
+:global(html[data-theme="dark"]) .goalTrack {
+  background: #344039;
+}
+
+:global(html[data-theme="dark"]) .leagueCard {
+  background: linear-gradient(135deg, #33271d, var(--paper-raised) 70%);
+}
+
+:global(html[data-theme="dark"]) .coachCard {
+  border-color: #3c6432;
+  background:
+    radial-gradient(circle at 12% 100%, #284924, transparent 48%),
+    #1c3220;
+  box-shadow: 0 4px 0 #102114;
+}
+
+:global(html[data-theme="dark"]) .coachCard h2 {
+  color: #a9e788;
+}
+
+:global(html[data-theme="dark"]) .comingSoonToast {
+  border-color: #317b9b;
+}
+
+:global(html[data-theme="dark"]) .toastIcon,
+:global(html[data-theme="dark"]) .mobileNav .mobileNavActive {
+  color: var(--sky);
+  background: #17313c;
+}
+
+:global(html[data-theme="dark"]) .comingSoonToast > button {
+  color: #9aa89d;
+  background: #2a3930;
+}
+
+:global(html[data-theme="dark"]) .comingSoonToast > button:hover {
+  color: var(--ink);
+  background: #35463a;
+}
+
 @media (max-width: 1200px) {
   .appShell {
     grid-template-columns: 245px minmax(520px, 760px);
@@ -631,12 +732,16 @@
     left: 0;
     min-height: 78px;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     padding: 8px 8px max(8px, env(safe-area-inset-bottom));
     border-top: 2px solid var(--line);
     background: rgb(255 255 255 / 96%);
     backdrop-filter: blur(18px);
     z-index: 100;
+  }
+
+  :global(html[data-theme="dark"]) .mobileNav {
+    background: var(--glass-strong);
   }
 
   .mobileNav button,
@@ -654,6 +759,14 @@
     font-weight: 1000;
     text-decoration: none;
     text-transform: uppercase;
+  }
+
+  .mobileNav .mobileThemeToggle {
+    width: auto;
+    height: auto;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
   }
 
   .mobileNav button svg,

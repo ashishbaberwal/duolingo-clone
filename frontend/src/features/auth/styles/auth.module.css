@@ -288,6 +288,13 @@
     white;
 }
 
+.authThemeToggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 5;
+}
+
 .loginForm {
   width: 100%;
   max-width: 410px;
@@ -628,6 +635,99 @@
 .sessionErrorCard button svg {
   width: 18px;
   height: 18px;
+}
+
+:global(html[data-theme="dark"]) .authPage {
+  background:
+    radial-gradient(circle at 8% 12%, rgb(120 223 59 / 14%), transparent 28%),
+    radial-gradient(circle at 91% 84%, rgb(85 201 255 / 10%), transparent 30%),
+    var(--canvas);
+}
+
+:global(html[data-theme="dark"]) .authFrame {
+  border-color: #365039;
+  background: var(--paper);
+  box-shadow:
+    0 10px 0 #101c14,
+    0 35px 90px rgb(0 0 0 / 34%);
+}
+
+:global(html[data-theme="dark"]) .brandPanel {
+  background:
+    linear-gradient(145deg, rgb(120 223 59 / 12%), transparent 45%),
+    linear-gradient(160deg, #236e19 0%, #339b1c 48%, #55bd26 100%);
+}
+
+:global(html[data-theme="dark"]) .formPanel {
+  background:
+    radial-gradient(circle at 100% 0%, rgb(255 216 74 / 5%), transparent 27%),
+    var(--paper);
+}
+
+:global(html[data-theme="dark"]) .formHeading h2,
+:global(html[data-theme="dark"]) .inputWrap input,
+:global(html[data-theme="dark"]) .sessionErrorCard h1 {
+  color: var(--ink);
+}
+
+:global(html[data-theme="dark"]) .formHeading p,
+:global(html[data-theme="dark"]) .authSwitch,
+:global(html[data-theme="dark"]) .passwordHint,
+:global(html[data-theme="dark"]) .sessionErrorCard p {
+  color: var(--muted);
+}
+
+:global(html[data-theme="dark"]) .field {
+  color: #c6d1c4;
+}
+
+:global(html[data-theme="dark"]) .inputWrap {
+  border-color: var(--line);
+  background: var(--paper-soft);
+}
+
+:global(html[data-theme="dark"]) .inputWrap:focus-within {
+  border-color: var(--sky);
+  background: var(--paper-raised);
+}
+
+:global(html[data-theme="dark"]) .inputWrap > svg {
+  color: #7f9083;
+}
+
+:global(html[data-theme="dark"]) .passwordToggle {
+  color: #91a095;
+}
+
+:global(html[data-theme="dark"]) .passwordToggle:hover {
+  color: var(--sky);
+  background: var(--sky-pale);
+}
+
+:global(html[data-theme="dark"]) .successMessage {
+  border-color: #386b2d;
+  color: #a7e887;
+  background: #1b3320;
+}
+
+:global(html[data-theme="dark"]) .authSwitch a {
+  color: var(--sky);
+}
+
+:global(html[data-theme="dark"]) .assignmentLabel {
+  color: #59675d;
+}
+
+:global(html[data-theme="dark"]) .sessionScreen {
+  background:
+    radial-gradient(circle at 50% 40%, rgb(120 223 59 / 8%), transparent 32%),
+    var(--canvas);
+}
+
+:global(html[data-theme="dark"]) .sessionErrorCard {
+  border-color: var(--line);
+  background: var(--paper-raised);
+  box-shadow: 0 6px 0 var(--theme-shadow);
 }
 
 @keyframes spin {

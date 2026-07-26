@@ -48,3 +48,10 @@
 .panda {
   background: #e8e8e8;
 }
+
+:global(html[data-theme="dark"]) .avatar {
+  border-color: rgb(237 245 233 / 34%);
+  box-shadow:
+    0 5px 0 rgb(0 0 0 / 22%),
+    inset 0 -8px 0 rgb(0 0 0 / 8%);
+}

@@ -1,5 +1,6 @@
 import { Heart, X } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 import styles from "../styles/lesson-shell.module.css";
 
 interface LessonHeaderProps {
@@ -35,6 +36,7 @@ export function LessonHeader({
         <Heart aria-hidden="true" fill="currentColor" />
         <strong>{hearts}</strong>
       </div>
+      <ThemeToggle className={styles.lessonThemeToggle} />
     </header>
   );
 }

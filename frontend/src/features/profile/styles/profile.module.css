@@ -314,6 +314,83 @@
   background: #f1f1f1;
 }
 
+:global(html[data-theme="dark"]) .hero {
+  border-color: #42683a;
+  background:
+    linear-gradient(125deg, rgb(32 58 31 / 95%), rgb(29 43 33 / 95%)),
+    var(--paper-raised);
+  box-shadow: 0 6px 0 #102013;
+}
+
+:global(html[data-theme="dark"]) .identity > span,
+:global(html[data-theme="dark"]) .sectionHeading span {
+  color: #8bc46d;
+}
+
+:global(html[data-theme="dark"]) .joinedBadge {
+  border-color: #405944;
+  color: #a8dc8d;
+  background: rgb(23 35 27 / 88%);
+}
+
+:global(html[data-theme="dark"]) .sectionHeading > strong,
+:global(html[data-theme="dark"]) .achievementMeta time {
+  color: #829087;
+}
+
+:global(html[data-theme="dark"]) .statCard,
+:global(html[data-theme="dark"]) .achievementCard,
+:global(html[data-theme="dark"]) .emptyAchievements {
+  background: var(--paper-raised);
+  box-shadow: 0 4px 0 var(--theme-shadow);
+}
+
+:global(html[data-theme="dark"]) .xp {
+  color: #ffdc65;
+  background: #3b331a;
+}
+
+:global(html[data-theme="dark"]) .streak {
+  color: #ffad56;
+  background: #3d291d;
+}
+
+:global(html[data-theme="dark"]) .lessons {
+  color: var(--sky);
+  background: var(--sky-pale);
+}
+
+:global(html[data-theme="dark"]) .skills {
+  color: #9ee77b;
+  background: #203b21;
+}
+
+:global(html[data-theme="dark"]) .goalCard {
+  border-color: #746326;
+  background: linear-gradient(115deg, #332f1c, #292718);
+  box-shadow: 0 4px 0 #16150d;
+}
+
+:global(html[data-theme="dark"]) .goalCopy > span,
+:global(html[data-theme="dark"]) .goalCopy p,
+:global(html[data-theme="dark"]) .goalRing span,
+:global(html[data-theme="dark"]) .achievementMeta span {
+  color: #e7c95e;
+}
+
+:global(html[data-theme="dark"]) .goalRing {
+  background: conic-gradient(var(--sun) var(--goal-progress), #48422d 0);
+}
+
+:global(html[data-theme="dark"]) .goalRing::before {
+  background: #292718;
+}
+
+:global(html[data-theme="dark"]) .emptyAchievements > svg {
+  color: #8e9c92;
+  background: #2a3930;
+}
+
 @media (max-width: 650px) {
   .hero {
     align-items: flex-start;

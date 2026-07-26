@@ -157,6 +157,31 @@
   text-transform: uppercase;
 }
 
+:global(html[data-theme="dark"]) .loadingScreen {
+  background: var(--paper);
+}
+
+:global(html[data-theme="dark"]) .loadingBrand span {
+  background: #294c25;
+}
+
+:global(html[data-theme="dark"]) .loadingSidebar,
+:global(html[data-theme="dark"]) .loadingRail,
+:global(html[data-theme="dark"]) .loadingBanner,
+:global(html[data-theme="dark"]) .loadingNode {
+  background: linear-gradient(90deg, #233128 25%, #304137 45%, #233128 65%);
+  background-size: 240% 100%;
+}
+
+:global(html[data-theme="dark"]) .errorCard {
+  background: var(--paper-raised);
+  box-shadow: 0 9px 0 var(--theme-shadow);
+}
+
+:global(html[data-theme="dark"]) .errorMascotWrap > svg:last-child {
+  border-color: var(--paper-raised);
+}
+
 @keyframes shimmer {
   from {
     background-position: 100% 0;
