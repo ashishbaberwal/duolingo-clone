@@ -44,13 +44,26 @@ systemctl restart lingotrail-api
 systemctl is-active --quiet lingotrail-api
 systemctl is-active --quiet caddy
 
-curl \
+if ! curl \
   --fail \
   --show-error \
   --silent \
-  --retry 5 \
+  --connect-timeout 2 \
+  --max-time 5 \
+  --retry 15 \
+  --retry-connrefused \
   --retry-delay 2 \
-  http://127.0.0.1:8000/api/v1/health
+  --retry-max-time 45 \
+  http://127.0.0.1:8000/api/v1/health; then
+  echo "FastAPI did not become ready after the systemd restart." >&2
+  systemctl status lingotrail-api --no-pager --full >&2 || true
+  journalctl \
+    --unit lingotrail-api \
+    --lines 80 \
+    --no-pager \
+    >&2 || true
+  exit 1
+fi
 
 echo
 echo "Backend update completed successfully."

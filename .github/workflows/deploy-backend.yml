@@ -48,6 +48,10 @@ jobs:
             --fail \
             --show-error \
             --silent \
-            --retry 5 \
+            --connect-timeout 5 \
+            --max-time 15 \
+            --retry 10 \
+            --retry-all-errors \
             --retry-delay 3 \
+            --retry-max-time 60 \
             https://lingotrail-api-139-59-18-245.sslip.io/api/v1/health

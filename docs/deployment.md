@@ -168,7 +168,10 @@ sudo ./deploy/digitalocean/update.sh
 `update.sh` refreshes a consistent SQLite safety copy at
 `/var/lib/lingotrail/lingotrail-before-deploy.db`, runs the idempotent native
 installer, restarts the API, verifies both systemd services, and checks the
-local health endpoint.
+local health endpoint. The health probe treats a short connection refusal as a
+normal Uvicorn startup window and retries for up to 45 seconds. If readiness
+never succeeds, the script prints the service status and recent journal entries
+directly in the GitHub Actions log.
 
 ### GitHub Actions deployment button
 
