@@ -13,7 +13,7 @@ repository and is covered by automated or desktop-browser validation.
 | SQLite with a designed schema | Complete | `backend/app/models`, Alembic migration, `docs/database-schema.md` |
 | Public repository with `frontend/` and `backend/` | Complete | Public `ashishbaberwal/duolingo-clone` GitHub repository |
 | README setup, stack, architecture, schema, API, assumptions | Complete | Root `README.md` and linked detailed guides |
-| Hosted working demo | Prepared | Vercel project and DigitalOcean Droplet configuration are ready; cloud authentication and a backend domain remain |
+| Hosted working demo | Complete | `https://lingotrail-scaler.vercel.app`, backed by persistent SQLite on DigitalOcean |
 
 ## 1. Learning path and skill tree
 
@@ -104,14 +104,14 @@ Audio, timed challenges, and dark mode remain optional and are not implemented.
 - Browser console during the latest social-page QA: zero errors and warnings.
 - Mobile-browser testing intentionally not run; responsive rules remain in code.
 
-## Remaining submission blocker
+## Hosted validation
 
-The repository is public and source documentation is complete. The only missing
-assignment deliverable is a hosted working URL. Infrastructure configuration is
-ready, and final deployment must include:
-
-1. a persistent production backend and database;
-2. production CORS, cookie, and secret configuration;
-3. a frontend configured with the public API URL;
-4. seeded production content and the documented demo learner;
-5. a final hosted login and lesson-completion smoke test.
+- Frontend: `https://lingotrail-scaler.vercel.app`
+- Backend health:
+  `https://lingotrail-api-139-59-18-245.sslip.io/api/v1/health`
+- Production login, session-cookie, current-user, and learning-path requests
+  passed through the Vercel same-origin proxy.
+- Desktop browser login and learning-path rendering passed with zero console
+  errors or warnings.
+- SQLite is stored outside the application checkout at
+  `/var/lib/lingotrail/lingotrail.db`.

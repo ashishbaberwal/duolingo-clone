@@ -1,0 +1,4 @@
+# Local-only environment values must not be compiled into Vercel builds.
+.env
+.env.local
+.env.*.local

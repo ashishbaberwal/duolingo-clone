@@ -1,6 +1,6 @@
 # Production deployment
 
-LingoTrail uses two deployment targets:
+LingoTrail uses two production targets:
 
 ```text
 Browser
@@ -13,20 +13,34 @@ Vercel - Next.js frontend
 DigitalOcean Droplet - Caddy HTTPS proxy
   |
   v
-FastAPI container -> host-mounted SQLite database
+systemd -> Uvicorn -> FastAPI -> persistent SQLite
 ```
 
+Live endpoints:
+
+- Frontend: `https://lingotrail-scaler.vercel.app`
+- Backend health:
+  `https://lingotrail-api-139-59-18-245.sslip.io/api/v1/health`
+
 The browser never calls the DigitalOcean hostname directly. Next.js rewrites
-`/api/*` to `API_PROXY_TARGET`, which keeps the authentication cookie
-first-party on the Vercel hostname. Local development continues to call
-`NEXT_PUBLIC_API_URL=http://localhost:8000` directly.
+`/api/*` to the server-only `API_PROXY_TARGET`, keeping the authentication
+cookie first-party on the Vercel hostname. Local development continues to use
+`NEXT_PUBLIC_API_URL=http://localhost:8000`.
 
-## Why a Droplet instead of App Platform
+## Why a Droplet and why no Docker
 
-DigitalOcean App Platform containers have an ephemeral filesystem and do not
-support volumes. Deployments or container replacements would delete SQLite
-learner progress. LingoTrail therefore uses one Droplet with
-`/var/lib/lingotrail` mounted into the API container at `/var/data`.
+DigitalOcean App Platform has an ephemeral local filesystem and does not
+support volumes. A deployment or container replacement could therefore delete
+SQLite learner progress. The Droplet keeps the database on its persistent disk
+at `/var/lib/lingotrail/lingotrail.db`.
+
+The production server runs FastAPI directly rather than inside Docker. This
+project has one backend service on one small virtual machine, so a native
+systemd deployment has fewer runtime layers and uses less memory. Reproducible
+dependencies still come from the committed `uv.lock`.
+
+Docker remains an optional packaging tool in the repository, but it is not part
+of the active DigitalOcean runtime.
 
 References:
 
@@ -34,109 +48,111 @@ References:
 - [DigitalOcean Droplet features](https://docs.digitalocean.com/products/droplets/details/features/)
 - [Vercel monorepo deployments](https://vercel.com/docs/monorepos)
 
+## Server layout
+
+```text
+/opt/lingotrail/                         Git checkout
+/opt/lingotrail/backend/.venv/           Locked production dependencies
+/etc/lingotrail/api.env                  Production environment and secret
+/etc/systemd/system/lingotrail-api.service
+/etc/caddy/Caddyfile
+/var/lib/lingotrail/lingotrail.db        Persistent learner data
+```
+
+FastAPI binds only to `127.0.0.1:8000`. The DigitalOcean Cloud Firewall exposes
+ports `22`, `80`, and `443`; Caddy is the only public application entry point.
+
 ## Deployment files
 
 ```text
-backend/Dockerfile
-deploy/digitalocean/compose.yaml
-deploy/digitalocean/Caddyfile
 deploy/digitalocean/.env.example
+deploy/digitalocean/Caddyfile
+deploy/digitalocean/install.sh
+deploy/digitalocean/lingotrail-api.service
+frontend/.vercelignore
 ```
 
-Docker Compose runs:
+`frontend/.vercelignore` prevents the local frontend `.env` from being compiled
+into Vercel builds. Production must use the server-only proxy variable instead
+of the local `NEXT_PUBLIC_API_URL`.
 
-- `api`: FastAPI, Alembic migrations, idempotent seed data, and Uvicorn;
-- `caddy`: HTTPS certificate automation and reverse proxying;
-- `caddy_data`: persistent certificate data;
-- `caddy_config`: persistent Caddy runtime configuration.
+## Initial Droplet deployment
 
-The SQLite file is outside Docker-managed storage at:
-
-```text
-/var/lib/lingotrail/lingotrail.db
-```
-
-Rebuilding or replacing containers does not remove this host directory.
-
-## Prerequisites
-
-Before creating the Droplet:
-
-1. Authenticate the DigitalOcean CLI or sign in to the control panel.
-2. Choose a Droplet region close to the evaluator.
-3. Create an Ubuntu Droplet with Docker installed.
-4. Add an SSH key; do not enable password-only administration.
-5. Allow inbound SSH, HTTP, and HTTPS through a DigitalOcean Cloud Firewall.
-6. Point a backend DNS record, such as `api.example.com`, to the Droplet.
-
-Caddy requires the DNS record to resolve before it can obtain the HTTPS
-certificate.
-
-## Droplet setup
-
-Clone the public repository and create the persistent directory:
+Create an Ubuntu 24.04 Droplet with an SSH key and a firewall allowing inbound
+SSH, HTTP, and HTTPS. Clone the repository:
 
 ```bash
-git clone https://github.com/ashishbaberwal/duolingo-clone.git
-cd duolingo-clone
-sudo install -d -m 750 -o root -g docker /var/lib/lingotrail
+git clone https://github.com/ashishbaberwal/duolingo-clone.git /opt/lingotrail
+cd /opt/lingotrail
 cp deploy/digitalocean/.env.example deploy/digitalocean/.env
 ```
 
-Generate a production secret on the Droplet:
-
-```bash
-openssl rand -base64 48
-```
-
-Edit `deploy/digitalocean/.env`:
+If no custom domain is available, an IP-encoded `sslip.io` hostname can provide
+DNS for the demo:
 
 ```text
-API_DOMAIN=api.your-domain.example
+lingotrail-api-139-59-18-245.sslip.io -> 139.59.18.245
+```
+
+Generate a production authentication secret:
+
+```bash
+openssl rand -hex 48
+```
+
+Set at least these values in `deploy/digitalocean/.env`:
+
+```text
+API_DOMAIN=lingotrail-api-139-59-18-245.sslip.io
 FRONTEND_ORIGIN=https://lingotrail-scaler.vercel.app
+DATABASE_URL=sqlite:////var/lib/lingotrail/lingotrail.db
 AUTH_SECRET_KEY=<generated value>
 ```
 
-The `.env` file is ignored by Git and must remain only on the server.
-
-Start the services:
+The real `.env` file is ignored by Git and must stay on the server. Run the
+idempotent native installer:
 
 ```bash
-docker compose \
-  --env-file deploy/digitalocean/.env \
-  -f deploy/digitalocean/compose.yaml \
-  up -d --build
+sudo ./deploy/digitalocean/install.sh
 ```
 
-Container startup runs these API steps in order:
+The installer:
+
+1. installs Caddy, curl, Git, and uv;
+2. creates a non-login `lingotrail` Linux user;
+3. installs locked production dependencies with `uv sync --frozen --no-dev`;
+4. installs the protected production environment file;
+5. installs and enables the systemd service;
+6. validates and restarts Caddy;
+7. verifies that both services are active.
+
+On every API start, systemd runs these steps in order:
 
 ```text
 alembic upgrade head
 python -m app.seed
-uvicorn app.main:app --host 0.0.0.0 --port $PORT
+uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-Migrations are repeatable, and seeding is idempotent, so redeploys do not
-duplicate content or overwrite learner progress.
+Migrations are repeatable and seeding is idempotent, so restarts neither
+duplicate content nor overwrite learner progress.
 
 ## Frontend deployment
 
 The local `frontend/` directory is linked to the Vercel project
 `ashishbaberwal/lingotrail-scaler`.
 
-Add this server-only variable to Production, Preview, and Development:
+Set this server-only variable in Production, Preview, and Development:
 
 ```text
-API_PROXY_TARGET=https://api.your-domain.example
+API_PROXY_TARGET=https://lingotrail-api-139-59-18-245.sslip.io
 ```
 
-Do not add `NEXT_PUBLIC_API_URL` in Vercel. Its absence makes browser requests
-same-origin.
-
-Deploy from the repository root:
+Do not configure `NEXT_PUBLIC_API_URL` in Vercel. Its absence makes browser
+requests same-origin. Deploy with a current Vercel CLI:
 
 ```bash
-vercel --cwd frontend --prod
+pnpm dlx vercel@latest --cwd frontend --prod --yes
 ```
 
 ## Updating the backend
@@ -144,50 +160,43 @@ vercel --cwd frontend --prod
 On the Droplet:
 
 ```bash
-cd duolingo-clone
+cd /opt/lingotrail
 git pull --ff-only origin main
-docker compose \
-  --env-file deploy/digitalocean/.env \
-  -f deploy/digitalocean/compose.yaml \
-  up -d --build
+sudo ./deploy/digitalocean/install.sh
 ```
 
-Check deployment state:
+Check service state and logs:
 
 ```bash
-docker compose \
-  --env-file deploy/digitalocean/.env \
-  -f deploy/digitalocean/compose.yaml \
-  ps
-docker compose \
-  --env-file deploy/digitalocean/.env \
-  -f deploy/digitalocean/compose.yaml \
-  logs --tail=100 api
+systemctl status lingotrail-api caddy
+journalctl -u lingotrail-api -n 100 --no-pager
+journalctl -u caddy -n 100 --no-pager
 ```
+
+The installer updates dependencies and configuration before restarting
+services. SQLite remains outside the checkout and is not replaced.
 
 ## Backup and restore
 
-Create a consistent SQLite backup without stopping the API:
+Create a consistent SQLite backup while the API remains online:
 
 ```bash
-docker compose \
-  --env-file deploy/digitalocean/.env \
-  -f deploy/digitalocean/compose.yaml \
-  exec api python -c \
-  'import sqlite3; source=sqlite3.connect("/var/data/lingotrail.db"); backup=sqlite3.connect("/var/data/lingotrail-backup.db"); source.backup(backup); backup.close(); source.close()'
+sudo -u lingotrail /opt/lingotrail/backend/.venv/bin/python -c \
+  'import sqlite3; source=sqlite3.connect("/var/lib/lingotrail/lingotrail.db"); backup=sqlite3.connect("/var/lib/lingotrail/lingotrail-backup.db"); source.backup(backup); backup.close(); source.close()'
 ```
 
-Copy backups off the Droplet or attach DigitalOcean Block Storage with a
-snapshot policy before treating the demo as long-lived production.
+Copy backups off the Droplet or use a DigitalOcean snapshot policy before
+treating the demo as long-lived production.
 
-For restoration:
+To restore:
 
-1. stop the API container;
+1. stop `lingotrail-api`;
 2. retain the current database as a recovery copy;
 3. restore a verified backup to `/var/lib/lingotrail/lingotrail.db`;
-4. start the services and run the smoke test.
+4. restore ownership to `lingotrail:lingotrail`;
+5. start the service and run the smoke test.
 
-Never overwrite the live database while the API is running.
+Never overwrite the live database while FastAPI is running.
 
 ## Production smoke test
 
@@ -197,14 +206,15 @@ Never overwrite the live database while the API is running.
 4. Complete a lesson and record the XP total.
 5. Reload and confirm XP and path progress persist.
 6. Open Profile and Leaderboards.
-7. Rebuild the backend containers and verify the XP still exists.
-8. Check both browser and container logs for errors.
-9. Check `https://api.your-domain.example/api/v1/health`.
+7. Restart `lingotrail-api` and confirm the XP remains.
+8. Check browser and systemd logs for errors.
+9. Check the public backend health endpoint.
 
 ## Rollback
 
 - Frontend: promote a previous Vercel deployment.
-- Backend: check out the previous known-good commit and rebuild the containers.
+- Backend code: check out the previous known-good commit, run
+  `uv sync --frozen --no-dev`, and restart `lingotrail-api`.
 - Schema: use a tested Alembic downgrade only when the migration explicitly
   supports it.
-- Data: restore a verified off-server SQLite backup or volume snapshot.
+- Data: restore a verified off-server SQLite backup or Droplet snapshot.

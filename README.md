@@ -191,14 +191,18 @@ The password is local demo data. SQLite stores only its Argon2id hash.
 
 ## Deployment
 
-Production is prepared for a Vercel Next.js frontend and a DigitalOcean Droplet
-running the FastAPI container with persistent SQLite storage. Vercel proxies
-same-origin `/api` requests to FastAPI, keeping the HttpOnly session cookie
-first-party.
+Production runs the Next.js frontend on Vercel and the FastAPI backend as a
+native systemd service on a DigitalOcean Droplet. Vercel proxies same-origin
+`/api` requests to FastAPI, keeping the HttpOnly session cookie first-party.
 
 The frontend Vercel project is `ashishbaberwal/lingotrail-scaler`. The
-DigitalOcean deployment uses Docker Compose, a host-mounted data directory, and
-Caddy-managed HTTPS.
+DigitalOcean deployment uses uv-managed locked Python dependencies, a
+restricted Linux service account, persistent SQLite storage, systemd process
+supervision, and Caddy-managed HTTPS.
+
+- Application: https://lingotrail-scaler.vercel.app
+- Backend health:
+  https://lingotrail-api-139-59-18-245.sslip.io/api/v1/health
 
 See [docs/deployment.md](docs/deployment.md) for environment variables, startup
 order, smoke tests, persistence verification, and rollback steps.
