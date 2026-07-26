@@ -62,7 +62,7 @@ correct answers, preventing the browser from becoming the authority.
 | Database-backed course hierarchy | Complete | content models and versioned initial migration |
 | Seeded units, skills, lessons, exercises | Complete | `backend/app/seed/catalog.py` |
 | Profile stats | Complete | `/api/v1/profile`, `/profile` |
-| Achievements | Complete | achievement models, seed data, profile badge UI |
+| Achievements | Complete | transactional award rules, one-time XP bonuses, completion celebration, profile badge UI |
 | Persistent learner progress | Complete | SQLAlchemy transactions and SQLite database |
 
 ## 5. Duolingo-style experience
@@ -95,7 +95,7 @@ Audio, timed challenges, and dark mode remain optional and are not implemented.
 
 ## Validation evidence
 
-- Backend: 50 pytest tests.
+- Backend: 51 pytest tests.
 - Frontend: 22 Vitest/Testing Library tests.
 - Monorepo gate: lint, type checking, tests, and production build in both
   workspaces.

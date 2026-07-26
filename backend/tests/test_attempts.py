@@ -7,15 +7,17 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models import (
+    Achievement,
     AttemptAnswer,
     Exercise,
     LessonAttempt,
     MatchSide,
     User,
+    UserAchievement,
     UserSkillProgress,
 )
 from app.seed import seed_database
-from app.services.stats import record_daily_streak
+from app.services.stats import current_date_for_learner, record_daily_streak
 from tests.helpers import (
     TEST_USERNAME,
     lesson_id_by_title,
@@ -168,14 +170,19 @@ def test_all_exercise_types_complete_lesson_and_persist_progress(
     first_feedback = complete_lesson(api_client, db_session, first_lesson_id)
     feedback = complete_lesson(api_client, db_session, second_lesson_id)
 
-    assert first_feedback["learner"]["total_xp"] == 10
+    assert first_feedback["learner"]["total_xp"] == 25
+    assert [
+        achievement["code"]
+        for achievement in first_feedback["unlocked_achievements"]
+    ] == ["first-step", "perfect-lesson"]
     assert feedback["status"] == "completed"
     assert feedback["answered_count"] == feedback["exercise_count"] == 5
     assert feedback["next_exercise_id"] is None
     assert feedback["xp_earned"] == 10
-    assert feedback["learner"]["total_xp"] == 20
-    assert feedback["learner"]["today_xp"] == 20
+    assert feedback["learner"]["total_xp"] == 35
+    assert feedback["learner"]["today_xp"] == 35
     assert feedback["learner"]["hearts"] == 5
+    assert feedback["unlocked_achievements"] == []
 
     learner = db_session.scalar(select(User).where(User.username == TEST_USERNAME))
     assert learner is not None
@@ -217,7 +224,7 @@ def test_practice_awards_xp_without_double_counting_skill_progress(
     complete_lesson(api_client, db_session, lesson_id)
     second_completion = complete_lesson(api_client, db_session, lesson_id)
 
-    assert second_completion["learner"]["total_xp"] == 20
+    assert second_completion["learner"]["total_xp"] == 35
     learner = db_session.scalar(select(User).where(User.username == TEST_USERNAME))
     assert learner is not None
     progress = db_session.scalar(
@@ -229,6 +236,67 @@ def test_practice_awards_xp_without_double_counting_skill_progress(
     assert progress is not None
     assert progress.lessons_completed == 1
     assert progress.crowns == 0
+
+
+def test_completion_awards_every_eligible_achievement_once(
+    db_session: Session,
+    api_client: TestClient,
+) -> None:
+    seed_database(db_session)
+    register_and_login_user(api_client)
+    learner = db_session.scalar(select(User).where(User.username == TEST_USERNAME))
+    assert learner is not None
+    today = current_date_for_learner(learner)
+    learner.total_xp = 90
+    learner.current_streak = 6
+    learner.longest_streak = 6
+    learner.last_activity_date = today - timedelta(days=1)
+    db_session.commit()
+
+    lesson_id = lesson_id_by_title(db_session, "Basics 1")
+    feedback = complete_lesson(api_client, db_session, lesson_id)
+
+    assert feedback["learner"]["total_xp"] == 140
+    assert feedback["learner"]["today_xp"] == 50
+    assert feedback["learner"]["current_streak"] == 7
+    assert [
+        (achievement["code"], achievement["xp_reward"])
+        for achievement in feedback["unlocked_achievements"]
+    ] == [
+        ("first-step", 5),
+        ("xp-100", 10),
+        ("week-warrior", 15),
+        ("perfect-lesson", 10),
+    ]
+
+    achievement_rows = db_session.execute(
+        select(UserAchievement, Achievement)
+        .join(Achievement)
+        .where(UserAchievement.user_id == learner.id)
+        .order_by(Achievement.id)
+    ).all()
+    assert [achievement.code for _, achievement in achievement_rows] == [
+        "first-step",
+        "xp-100",
+        "week-warrior",
+        "perfect-lesson",
+    ]
+
+    profile = api_client.get("/api/v1/profile")
+    assert profile.status_code == 200
+    assert [
+        (achievement["code"], achievement["xp_reward"])
+        for achievement in profile.json()["achievements"]
+    ] == [
+        ("first-step", 5),
+        ("xp-100", 10),
+        ("week-warrior", 15),
+        ("perfect-lesson", 10),
+    ]
+
+    practice_feedback = complete_lesson(api_client, db_session, lesson_id)
+    assert practice_feedback["unlocked_achievements"] == []
+    assert len(learner.achievements) == 4
 
 
 def test_zero_hearts_fails_attempt_until_mock_refill(

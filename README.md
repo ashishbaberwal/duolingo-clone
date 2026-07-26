@@ -23,7 +23,7 @@
     <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" />
     <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-Python_3.12-009688?logo=fastapi&logoColor=white" />
     <img alt="SQLite" src="https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white" />
-    <img alt="Tests" src="https://img.shields.io/badge/tests-72_passing-2EA44F" />
+    <img alt="Tests" src="https://img.shields.io/badge/tests-73_passing-2EA44F" />
     <img alt="Turborepo" src="https://img.shields.io/badge/monorepo-Turborepo-EF4444?logo=turborepo&logoColor=white" />
   </p>
 </div>
@@ -72,7 +72,7 @@ authenticated user.
 | --- | --- |
 | Learning path | Ordered units and skills with completed, available, and locked states, progress rings, crowns, and prerequisite-based unlocking |
 | Lesson experience | Multiple choice, word bank, match pairs, fill-in-the-blank, and typed-answer exercises with immediate server-validated feedback |
-| Gamification | Persistent hearts, XP, streaks, daily goal, gems, crowns, leaderboard position, and achievement-ready profile data |
+| Gamification | Persistent hearts, XP, streaks, daily goal, gems, crowns, leaderboard position, and automatically awarded achievements |
 | Persistence | Learner accounts, lesson attempts, answers, daily activity, skill progress, and rankings stored in a relational SQLite schema |
 | Authentication | Independent signup and login, Argon2id password hashes, signed sessions, and Secure HttpOnly cookie support |
 | Product UI | Original LingoTrail identity, Pip mascot, animated outcomes, completion celebration, placeholders, and responsive styling |
@@ -168,7 +168,8 @@ produces a separate path, heart balance, streak, attempt history, and rank.
 - Daily XP goal
 - Gems and crowns
 - Seeded league leaderboard
-- Achievement definitions, profile badge UI, and learner-achievement schema
+- Automatically awarded First Step, XP Explorer, Week Warrior, and Perfect
+  Lesson badges with one-time XP bonuses
 
 ### Product quality
 
@@ -350,11 +351,28 @@ record final answer
 → update daily activity
 → update streak
 → advance skill progress
+→ award newly eligible achievements
 → commit once
 ```
 
 If any operation fails, the transaction rolls back instead of leaving partial
 XP or progress.
+
+### Achievement awards
+
+Achievement rules run only after the current lesson has updated XP, streak, and
+progress, so each decision sees the final transaction state:
+
+| Achievement | Rule | Bonus |
+| --- | --- | ---: |
+| First Step | Complete the first distinct lesson | 5 XP |
+| XP Explorer | Reach 100 total XP | 10 XP |
+| Week Warrior | Reach a seven-day streak | 15 XP |
+| Perfect Lesson | Complete a lesson with no wrong answers | 10 XP |
+
+The learner/achievement pair is unique in SQLite, preventing duplicate rewards.
+Bonus XP updates both total XP and the current daily goal. Newly earned badges
+appear in the lesson celebration immediately and remain visible on the Profile.
 
 ### Preventing accidental duplicate rewards
 
@@ -685,7 +703,7 @@ pnpm check
 Current verified result:
 
 ```text
-Backend tests:  50 passed
+Backend tests:  51 passed
 Frontend tests: 22 passed
 Turbo tasks:     8 / 8 successful
 ```

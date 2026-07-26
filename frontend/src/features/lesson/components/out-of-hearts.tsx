@@ -18,6 +18,9 @@ export function OutOfHearts({
     <main className={styles.outcomeScreen}>
       <motion.section
         className={styles.heartsCard}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="out-of-hearts-heading"
         initial={{ opacity: 0, y: 24, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
       >
@@ -26,7 +29,7 @@ export function OutOfHearts({
           <span>0</span>
         </div>
         <span className={styles.eyebrow}>PAUSE. REFILL. RETURN.</span>
-        <h1>You&apos;re out of hearts</h1>
+        <h1 id="out-of-hearts-heading">You&apos;re out of hearts</h1>
         <p>
           {message ??
             "Mistakes are part of learning. Refill your hearts and try this lesson again."}

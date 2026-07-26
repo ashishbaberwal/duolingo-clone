@@ -36,6 +36,7 @@ def get_profile(
             title=achievement.title,
             description=achievement.description,
             icon=achievement.icon,
+            xp_reward=achievement.xp_reward,
             unlocked_at=_as_utc(user_achievement.unlocked_at),
         )
         for user_achievement, achievement in achievement_rows

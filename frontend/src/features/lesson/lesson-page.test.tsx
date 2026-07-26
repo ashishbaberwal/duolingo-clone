@@ -128,6 +128,7 @@ describe("LessonPage", () => {
           exercise_count: 2,
           next_exercise_id: 102,
           xp_earned: 0,
+          unlocked_achievements: [],
           learner: {
             hearts: 5,
             max_hearts: 5,
@@ -191,6 +192,7 @@ describe("LessonPage", () => {
           exercise_count: 2,
           next_exercise_id: 102,
           xp_earned: 0,
+          unlocked_achievements: [],
           learner: {
             hearts: 4,
             max_hearts: 5,
@@ -246,6 +248,15 @@ describe("LessonPage", () => {
           exercise_count: 1,
           next_exercise_id: null,
           xp_earned: 10,
+          unlocked_achievements: [
+            {
+              code: "first-step",
+              title: "First Step",
+              description: "Complete your first lesson.",
+              icon: "footprints",
+              xp_reward: 5,
+            },
+          ],
           learner: {
             hearts: 5,
             max_hearts: 5,
@@ -271,7 +282,15 @@ describe("LessonPage", () => {
     expect(
       screen.getByRole("heading", { name: "Lesson complete!" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", { name: "Lesson complete!" }),
+    ).toHaveAttribute("aria-modal", "true");
     expect(screen.getByText("+10")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Achievement unlocked!" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("First Step")).toBeInTheDocument();
+    expect(screen.getByText("+5 bonus XP")).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /continue on the path/i }),
     ).toHaveAttribute("href", "/");
@@ -314,6 +333,9 @@ describe("LessonPage", () => {
     expect(
       await screen.findByRole("heading", { name: "You're out of hearts" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", { name: "You're out of hearts" }),
+    ).toHaveAttribute("aria-modal", "true");
     fireEvent.click(
       screen.getByRole("button", { name: /refill hearts and retry/i }),
     );

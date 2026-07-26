@@ -62,6 +62,14 @@ export interface LessonAttempt {
   current_exercise_id: number | null;
 }
 
+export interface UnlockedAchievement {
+  code: string;
+  title: string;
+  description: string;
+  icon: string;
+  xp_reward: number;
+}
+
 export interface AnswerFeedback {
   attempt_id: number;
   exercise_id: number;
@@ -75,6 +83,7 @@ export interface AnswerFeedback {
   exercise_count: number;
   next_exercise_id: number | null;
   xp_earned: number;
+  unlocked_achievements: UnlockedAchievement[];
   learner: LearnerStats;
 }
 

@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from sqlalchemy.orm import Session
 
 from app.models import (
+    Achievement,
     AttemptAnswer,
     Exercise,
     LessonAttempt,
@@ -14,6 +15,7 @@ from app.repositories.attempts import (
     get_attempt_for_user,
 )
 from app.schemas.attempt import (
+    AchievementUnlockResponse,
     AnswerFeedbackResponse,
     HeartsRefillResponse,
     LessonAttemptResponse,
@@ -148,11 +150,12 @@ def submit_answer(
 
     answered_count = len(attempt.answers)
     completed_at = datetime.now(UTC)
+    unlocked_achievements: list[Achievement] = []
     if not is_correct and learner.hearts == 0:
         attempt.status = AttemptStatus.FAILED
         attempt.completed_at = completed_at
     elif answered_count == len(attempt.lesson.exercises):
-        complete_attempt(
+        unlocked_achievements = complete_attempt(
             session,
             learner,
             attempt,
@@ -184,6 +187,16 @@ def submit_answer(
             else None
         ),
         xp_earned=attempt.xp_earned,
+        unlocked_achievements=[
+            AchievementUnlockResponse(
+                code=achievement.code,
+                title=achievement.title,
+                description=achievement.description,
+                icon=achievement.icon,
+                xp_reward=achievement.xp_reward,
+            )
+            for achievement in unlocked_achievements
+        ],
         learner=get_learner_stats(session, learner),
     )
 

@@ -36,6 +36,7 @@ const profile = {
       title: "First Step",
       description: "Complete your first lesson.",
       icon: "footprints",
+      xp_reward: 5,
       unlocked_at: "2026-07-25T10:00:00Z",
     },
   ],
@@ -74,6 +75,7 @@ describe("ProfileRoute", () => {
     expect(screen.getByText("8")).toBeInTheDocument();
     expect(screen.getByText("10 of 20 XP")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "First Step" })).toBeInTheDocument();
+    expect(screen.getByText("+5 XP")).toBeInTheDocument();
     expect(
       within(
         screen.getByRole("navigation", { name: "Primary navigation" }),

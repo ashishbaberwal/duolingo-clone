@@ -97,12 +97,15 @@ dynamically.
 
 The reusable achievement definitions are:
 
-- First Step;
-- XP Explorer;
-- Week Warrior;
-- Perfect Lesson.
+- First Step: complete the first distinct lesson;
+- XP Explorer: reach 100 total XP;
+- Week Warrior: reach a seven-day streak;
+- Perfect Lesson: complete a lesson without a wrong answer.
 
 They are awarded to registered learners only when service rules are satisfied.
+The award and its configured bonus XP share the lesson-completion transaction.
+The unique learner/achievement pair prevents a repeated lesson from granting
+the same bonus again.
 
 ## Idempotency and transaction design
 

@@ -3,6 +3,7 @@ from datetime import date, datetime
 from sqlalchemy.orm import Session
 
 from app.models import (
+    Achievement,
     DailyActivity,
     Lesson,
     LessonAttempt,
@@ -15,6 +16,7 @@ from app.repositories.attempts import (
     get_skill_progress_row,
     has_completed_lesson,
 )
+from app.services.achievements import award_eligible_achievements
 from app.services.stats import record_daily_streak
 
 
@@ -64,7 +66,7 @@ def _record_lesson_activity(
     learner: User,
     lesson: Lesson,
     activity_date: date,
-) -> None:
+) -> DailyActivity:
     activity = get_daily_activity(
         session,
         user_id=learner.id,
@@ -83,6 +85,7 @@ def _record_lesson_activity(
     activity.lessons_completed += 1
     learner.total_xp += lesson.xp_reward
     record_daily_streak(learner, activity_date)
+    return activity
 
 
 def complete_attempt(
@@ -92,9 +95,9 @@ def complete_attempt(
     *,
     completed_at: datetime,
     activity_date: date,
-) -> None:
+) -> list[Achievement]:
     _update_skill_progress(session, learner, attempt.lesson, completed_at)
-    _record_lesson_activity(
+    activity = _record_lesson_activity(
         session,
         learner,
         attempt.lesson,
@@ -103,3 +106,10 @@ def complete_attempt(
     attempt.status = AttemptStatus.COMPLETED
     attempt.xp_earned = attempt.lesson.xp_reward
     attempt.completed_at = completed_at
+    return award_eligible_achievements(
+        session,
+        learner,
+        attempt,
+        activity,
+        unlocked_at=completed_at,
+    )

@@ -43,6 +43,14 @@ class LessonAttemptResponse(ApiModel):
     current_exercise_id: int | None
 
 
+class AchievementUnlockResponse(ApiModel):
+    code: str
+    title: str
+    description: str
+    icon: str
+    xp_reward: int
+
+
 class AnswerFeedbackResponse(ApiModel):
     attempt_id: int
     exercise_id: int
@@ -56,6 +64,7 @@ class AnswerFeedbackResponse(ApiModel):
     exercise_count: int
     next_exercise_id: int | None
     xp_earned: int
+    unlocked_achievements: list[AchievementUnlockResponse]
     learner: LearnerStats
 
 

@@ -286,12 +286,23 @@
   font-weight: 750;
 }
 
-.achievementCard time {
+.achievementMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.achievementMeta time,
+.achievementMeta span {
   color: #aaa;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.achievementMeta span {
+  color: #8d6a00;
 }
 
 .emptyAchievements > svg {

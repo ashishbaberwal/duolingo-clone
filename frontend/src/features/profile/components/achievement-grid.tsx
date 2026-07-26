@@ -1,20 +1,7 @@
-import {
-  Flame,
-  Footprints,
-  LockKeyhole,
-  Sparkles,
-  Trophy,
-  type LucideIcon,
-} from "lucide-react";
+import { LockKeyhole } from "lucide-react";
+import { AchievementIcon } from "@/components/achievements/achievement-icon";
 import type { Achievement } from "@/lib/api/types";
 import styles from "../styles/profile.module.css";
-
-const ACHIEVEMENT_ICONS: Readonly<Record<string, LucideIcon>> = {
-  flame: Flame,
-  footprints: Footprints,
-  sparkles: Sparkles,
-  trophy: Trophy,
-};
 
 interface AchievementGridProps {
   achievements: Achievement[];
@@ -36,24 +23,26 @@ export function AchievementGrid({ achievements }: AchievementGridProps) {
       {achievements.length > 0 ? (
         <div className={styles.achievementGrid}>
           {achievements.map((achievement) => {
-            const Icon = ACHIEVEMENT_ICONS[achievement.icon] ?? Trophy;
             return (
               <article className={styles.achievementCard} key={achievement.code}>
                 <span className={styles.achievementIcon}>
-                  <Icon aria-hidden="true" />
+                  <AchievementIcon icon={achievement.icon} />
                 </span>
                 <div>
                   <h3>{achievement.title}</h3>
                   <p>{achievement.description}</p>
-                  <time dateTime={achievement.unlocked_at}>
-                    Earned{" "}
-                    {new Intl.DateTimeFormat("en", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                      timeZone: "UTC",
-                    }).format(new Date(achievement.unlocked_at))}
-                  </time>
+                  <div className={styles.achievementMeta}>
+                    <time dateTime={achievement.unlocked_at}>
+                      Earned{" "}
+                      {new Intl.DateTimeFormat("en", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        timeZone: "UTC",
+                      }).format(new Date(achievement.unlocked_at))}
+                    </time>
+                    <span>+{achievement.xp_reward} XP</span>
+                  </div>
                 </div>
               </article>
             );

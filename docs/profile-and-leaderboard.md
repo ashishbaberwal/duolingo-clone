@@ -66,6 +66,7 @@ responsibility, which gives every client the same authoritative order.
 - One-day streak text uses singular grammar.
 - Unknown avatar and achievement keys fall back safely.
 - Empty achievement lists render a useful next action.
+- Newly earned badges include their one-time XP bonus and UTC award date.
 - The podium tolerates fewer than three returned entries.
 - The current learner row is identified by the server-provided boolean rather
   than comparing display names.

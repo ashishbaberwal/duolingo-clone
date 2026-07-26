@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import type { AnswerFeedback, LessonResponse } from "../lesson.types";
 import styles from "../styles/outcomes.module.css";
+import { AchievementUnlocks } from "./achievement-unlocks";
 
 interface LessonCompleteProps {
   feedback: AnswerFeedback;
@@ -21,6 +22,9 @@ export function LessonComplete({
     <main className={styles.outcomeScreen}>
       <motion.section
         className={styles.completeCard}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="lesson-complete-heading"
         initial={{ opacity: 0, y: 30, scale: 0.94 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring", stiffness: 240, damping: 22 }}
@@ -40,7 +44,7 @@ export function LessonComplete({
           </span>
         </div>
         <span className={styles.eyebrow}>TRAIL STEP COMPLETE</span>
-        <h1>Lesson complete!</h1>
+        <h1 id="lesson-complete-heading">Lesson complete!</h1>
         <p>
           You finished <strong>{lesson.title}</strong> and moved{" "}
           {lesson.skill_title} forward.
@@ -63,6 +67,10 @@ export function LessonComplete({
             <span>finished</span>
           </div>
         </div>
+
+        <AchievementUnlocks
+          achievements={feedback.unlocked_achievements}
+        />
 
         <Link href="/">
           Continue on the path

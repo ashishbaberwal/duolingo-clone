@@ -172,7 +172,8 @@ type_answer     -> text
 
 The response returns immediate correctness, learner-safe feedback, the
 canonical answer after an incorrect non-match submission, explanation, updated
-hearts, attempt progress, and the next exercise ID.
+hearts, attempt progress, the next exercise ID, and any achievements unlocked
+by lesson completion.
 
 The API rejects:
 
@@ -188,7 +189,8 @@ On the final answer, one transaction:
 2. awards lesson XP;
 3. updates today's activity and streak;
 4. advances skill progress without double-counting practice;
-5. returns refreshed learner statistics.
+5. awards newly eligible achievements and their one-time XP bonuses;
+6. returns refreshed learner statistics and unlock details.
 
 Wrong answers decrement both the learner's persistent hearts and the attempt
 snapshot. Reaching zero marks the attempt failed.

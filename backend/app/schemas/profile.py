@@ -8,6 +8,7 @@ class AchievementResponse(ApiModel):
     title: str
     description: str
     icon: str
+    xp_reward: int
     unlocked_at: datetime
 
 

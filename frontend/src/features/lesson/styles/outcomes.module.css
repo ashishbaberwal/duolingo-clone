@@ -141,6 +141,91 @@
   text-transform: uppercase;
 }
 
+.achievementUnlocks {
+  margin: -10px 0 30px;
+  padding: 19px;
+  color: #725600;
+  background: linear-gradient(145deg, #fffdf0, #fff6bd);
+  border: 2px solid #ffe166;
+  border-radius: 20px;
+  text-align: left;
+}
+
+.achievementUnlocks > span {
+  display: block;
+  color: #9a7300;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.achievementUnlocks h2 {
+  margin: 3px 0 13px;
+  color: #4a3a00;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.achievementUnlocks > div {
+  display: grid;
+  gap: 10px;
+}
+
+.achievementUnlock {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px;
+  background: rgb(255 255 255 / 78%);
+  border: 1px solid rgb(205 156 0 / 22%);
+  border-radius: 15px;
+}
+
+.achievementUnlock i {
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: #8a6500;
+  background: #ffdf5a;
+  border-radius: 14px;
+  box-shadow: inset 0 -4px 0 rgb(130 87 0 / 12%);
+}
+
+.achievementUnlock i svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2.8;
+}
+
+.achievementUnlock strong,
+.achievementUnlock p,
+.achievementUnlock small {
+  display: block;
+}
+
+.achievementUnlock strong {
+  color: #3f3308;
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.achievementUnlock p {
+  margin: 1px 0 3px;
+  color: #786d47;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.achievementUnlock small {
+  color: #8b6800;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .completeCard > a,
 .heartsCard > button {
   width: 100%;
