@@ -8,13 +8,23 @@
     },
     "build": {
       "dependsOn": ["^build", "check-types"],
+      "env": [
+        "API_PROXY_TARGET",
+        "NEXT_PUBLIC_API_URL",
+        "NEXT_PUBLIC_AUTH_COOKIE_NAME"
+      ],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types"],
+      "env": [
+        "API_PROXY_TARGET",
+        "NEXT_PUBLIC_API_URL",
+        "NEXT_PUBLIC_AUTH_COOKIE_NAME"
+      ]
     },
     "test": {
       "dependsOn": ["^test"]
