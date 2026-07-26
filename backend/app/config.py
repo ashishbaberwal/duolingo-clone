@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     frontend_origin: str = "http://localhost:3000"
     database_url: str = "sqlite:///./data/lingotrail.db"
     database_echo: bool = False
+    default_learner_username: str = "learner"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

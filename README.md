@@ -127,3 +127,19 @@ The command is idempotent: the first run creates the catalog and sample users,
 while later runs report that the seed is already present without duplicating
 records. The complete dataset is described in
 [docs/seed-data.md](docs/seed-data.md).
+
+## API
+
+The FastAPI service exposes versioned JSON endpoints under `/api/v1`:
+
+```text
+GET /api/v1/path
+GET /api/v1/lessons/{lesson_id}
+GET /api/v1/profile
+GET /api/v1/leaderboard
+```
+
+Interactive OpenAPI documentation is available at
+http://localhost:8000/docs. See the [API guide](docs/api.md) and
+[ADR 003](docs/decisions/003-public-api-boundary.md) for response contracts,
+privacy rules, and architectural decisions.
