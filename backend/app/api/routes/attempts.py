@@ -7,12 +7,12 @@ from app.schemas.attempt import (
     HeartsRefillResponse,
     LessonAttemptResponse,
 )
+from app.services.answer_evaluation import InvalidAnswerError
 from app.services.learning import LessonLockedError, LessonNotFoundError
 from app.services.lesson_attempts import (
     AttemptClosedError,
     AttemptNotFoundError,
     ExerciseOrderError,
-    InvalidAnswerError,
     OutOfHeartsError,
     refill_hearts,
     start_or_resume_attempt,
