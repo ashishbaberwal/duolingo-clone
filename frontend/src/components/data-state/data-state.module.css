@@ -1,0 +1,103 @@
+.screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 18% 22%, rgb(88 204 2 / 12%), transparent 27%),
+    radial-gradient(circle at 82% 76%, rgb(28 176 246 / 11%), transparent 29%),
+    var(--canvas);
+}
+
+.loadingCard,
+.errorCard {
+  width: min(100%, 440px);
+  padding: 38px;
+  border: 2px solid var(--line);
+  border-radius: 28px;
+  background: white;
+  box-shadow: 0 7px 0 #e2e7dd;
+  text-align: center;
+}
+
+.loadingCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.loadingCard span {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--leaf);
+  animation: bounce 900ms infinite alternate;
+}
+
+.loadingCard span:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.loadingCard span:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+.loadingCard strong {
+  width: 100%;
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.errorCard > span {
+  color: var(--heart);
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 0.13em;
+}
+
+.errorCard h1 {
+  margin: 8px 0;
+  font-size: 32px;
+  letter-spacing: -0.04em;
+}
+
+.errorCard p {
+  margin: 0 0 23px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.errorCard button {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 14px;
+  color: white;
+  background: var(--sky);
+  box-shadow: 0 4px 0 var(--sky-deep);
+  cursor: pointer;
+  font-weight: 1000;
+  text-transform: uppercase;
+}
+
+.errorCard button svg {
+  width: 18px;
+}
+
+@keyframes bounce {
+  to {
+    transform: translateY(-8px);
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loadingCard span {
+    animation: none;
+  }
+}

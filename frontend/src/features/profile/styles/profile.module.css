@@ -1,0 +1,328 @@
+.page {
+  display: grid;
+  gap: 36px;
+}
+
+.hero {
+  position: relative;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 34px;
+  border: 2px solid #bfe999;
+  border-radius: 28px;
+  overflow: hidden;
+  background:
+    linear-gradient(125deg, rgb(240 255 228 / 95%), rgb(255 255 255 / 95%)),
+    white;
+  box-shadow: 0 6px 0 #d6eac6;
+}
+
+.heroPattern {
+  position: absolute;
+  top: -70px;
+  right: -40px;
+  width: 270px;
+  height: 270px;
+  border: 38px solid rgb(88 204 2 / 8%);
+  border-radius: 50%;
+}
+
+.heroPattern::after {
+  content: "";
+  position: absolute;
+  inset: 32px;
+  border: 25px solid rgb(28 176 246 / 7%);
+  border-radius: inherit;
+}
+
+.identity {
+  position: relative;
+  min-width: 0;
+}
+
+.identity > span,
+.sectionHeading span,
+.goalCopy > span {
+  color: #6d9d4d;
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 0.13em;
+}
+
+.identity h1 {
+  margin: 5px 0 1px;
+  font-size: clamp(38px, 6vw, 56px);
+  font-weight: 1000;
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.identity p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.joinedBadge {
+  position: relative;
+  min-height: 43px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 0 14px;
+  border: 2px solid #d7eccc;
+  border-radius: 14px;
+  color: #4f8231;
+  background: rgb(255 255 255 / 88%);
+  font-size: 12px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.joinedBadge svg {
+  width: 18px;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 17px;
+}
+
+.sectionHeading h2 {
+  margin: 3px 0 0;
+  font-size: 25px;
+  font-weight: 1000;
+  letter-spacing: -0.035em;
+}
+
+.sectionHeading > strong {
+  color: #999;
+  font-size: 12px;
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 13px;
+}
+
+.statCard {
+  min-height: 102px;
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 18px;
+  border: 2px solid var(--line);
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 4px 0 #ededed;
+}
+
+.statIcon {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 17px;
+}
+
+.statIcon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.xp {
+  color: #c49300;
+  background: #fff5c2;
+}
+
+.streak {
+  color: #f38a00;
+  background: #fff0d4;
+}
+
+.lessons {
+  color: #1689c1;
+  background: #ddf4ff;
+}
+
+.skills {
+  color: #45a000;
+  background: #e5ffd1;
+}
+
+.statCard div {
+  display: grid;
+}
+
+.statCard strong {
+  font-size: 22px;
+  font-weight: 1000;
+  line-height: 1.05;
+}
+
+.statCard div span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.goalCard {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 14px;
+  padding: 23px 27px;
+  border: 2px solid #ffe27a;
+  border-radius: 22px;
+  background:
+    linear-gradient(115deg, #fffdf1, #fff8ce);
+  box-shadow: 0 4px 0 #f0df9e;
+}
+
+.goalCopy {
+  flex: 1;
+}
+
+.goalCopy > span {
+  color: #ac8300;
+}
+
+.goalCopy h3 {
+  margin: 4px 0 2px;
+  font-size: 22px;
+  font-weight: 1000;
+}
+
+.goalCopy p {
+  margin: 0;
+  color: #806d29;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.goalRing {
+  --goal-progress: 0deg;
+  width: 79px;
+  height: 79px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: conic-gradient(var(--sun) var(--goal-progress), #f3e9bd 0);
+}
+
+.goalRing::before {
+  content: "";
+  width: 59px;
+  height: 59px;
+  border-radius: inherit;
+  background: #fffdf3;
+}
+
+.goalRing span {
+  position: absolute;
+  color: #8c6a00;
+  font-size: 14px;
+  font-weight: 1000;
+}
+
+.achievementGrid {
+  display: grid;
+  gap: 12px;
+}
+
+.achievementCard,
+.emptyAchievements {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 19px;
+  border: 2px solid var(--line);
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 4px 0 #ededed;
+}
+
+.achievementIcon {
+  width: 61px;
+  height: 61px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 20px;
+  color: #8d6a00;
+  background: linear-gradient(145deg, #fff4a6, #ffd74f);
+  box-shadow: inset 0 -5px 0 rgb(139 99 0 / 12%);
+}
+
+.achievementIcon svg {
+  width: 31px;
+  height: 31px;
+  stroke-width: 2.8;
+}
+
+.achievementCard h3,
+.emptyAchievements h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 1000;
+}
+
+.achievementCard p,
+.emptyAchievements p {
+  margin: 2px 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.achievementCard time {
+  color: #aaa;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.emptyAchievements > svg {
+  width: 45px;
+  height: 45px;
+  padding: 10px;
+  border-radius: 15px;
+  color: #aaa;
+  background: #f1f1f1;
+}
+
+@media (max-width: 650px) {
+  .hero {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 26px;
+  }
+
+  .joinedBadge {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
+
+  .statGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionHeading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+}

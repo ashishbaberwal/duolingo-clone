@@ -2,7 +2,11 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiGet, apiRequest, type ApiError } from "@/lib/api/client";
-import { learningPathQueryKey } from "@/lib/api/queries";
+import {
+  leaderboardQueryKey,
+  learningPathQueryKey,
+  profileQueryKey,
+} from "@/lib/api/queries";
 import type {
   AuthenticatedUser,
   LoginCredentials,
@@ -34,6 +38,8 @@ export function useLogin() {
     onSuccess: (user) => {
       queryClient.setQueryData(currentUserQueryKey, user);
       void queryClient.invalidateQueries({ queryKey: learningPathQueryKey });
+      void queryClient.invalidateQueries({ queryKey: profileQueryKey });
+      void queryClient.invalidateQueries({ queryKey: leaderboardQueryKey });
     },
   });
 }
@@ -46,6 +52,8 @@ export function useLogout() {
     onSettled: () => {
       queryClient.removeQueries({ queryKey: currentUserQueryKey });
       queryClient.removeQueries({ queryKey: learningPathQueryKey });
+      queryClient.removeQueries({ queryKey: profileQueryKey });
+      queryClient.removeQueries({ queryKey: leaderboardQueryKey });
     },
   });
 }

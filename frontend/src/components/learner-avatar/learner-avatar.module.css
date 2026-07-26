@@ -1,0 +1,50 @@
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 3px solid rgb(255 255 255 / 78%);
+  border-radius: 31%;
+  background: #ddf4ff;
+  box-shadow:
+    0 5px 0 rgb(0 0 0 / 10%),
+    inset 0 -8px 0 rgb(0 0 0 / 4%);
+  line-height: 1;
+}
+
+.small {
+  width: 43px;
+  height: 43px;
+  font-size: 25px;
+}
+
+.medium {
+  width: 58px;
+  height: 58px;
+  font-size: 34px;
+}
+
+.large {
+  width: 104px;
+  height: 104px;
+  font-size: 62px;
+}
+
+.fox {
+  background: #ffdfb2;
+}
+
+.owl {
+  background: #d6f5bc;
+}
+
+.bear {
+  background: #ffe2c2;
+}
+
+.lion {
+  background: #fff0ad;
+}
+
+.panda {
+  background: #e8e8e8;
+}

@@ -51,3 +51,36 @@ export interface LearningPathResponse {
   learner: LearnerStats;
   units: UnitNode[];
 }
+
+export interface Achievement {
+  code: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked_at: string;
+}
+
+export interface ProfileResponse {
+  username: string;
+  display_name: string;
+  avatar_key: string;
+  stats: LearnerStats;
+  longest_streak: number;
+  skills_completed: number;
+  lessons_completed: number;
+  achievements: Achievement[];
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  username: string;
+  display_name: string;
+  avatar_key: string;
+  total_xp: number;
+  is_current_learner: boolean;
+}
+
+export interface LeaderboardResponse {
+  entries: LeaderboardEntry[];
+  current_learner_rank: number;
+}
