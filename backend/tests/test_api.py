@@ -1,23 +1,8 @@
 from fastapi.testclient import TestClient
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Lesson
 from app.seed import seed_database
-
-
-def login_demo(client: TestClient) -> None:
-    response = client.post(
-        "/api/v1/auth/login",
-        json={"username": "learner", "password": "LingoTrail@123"},
-    )
-    assert response.status_code == 200
-
-
-def lesson_id_by_title(session: Session, title: str) -> int:
-    lesson_id = session.scalar(select(Lesson.id).where(Lesson.title == title))
-    assert lesson_id is not None
-    return lesson_id
+from tests.helpers import lesson_id_by_title, login_demo
 
 
 def test_learning_path_returns_progress_and_unlock_states(
@@ -176,6 +161,9 @@ def test_openapi_lists_public_endpoints_without_answer_fields(
         "/api/v1/auth/login",
         "/api/v1/auth/logout",
         "/api/v1/auth/me",
+        "/api/v1/lessons/{lesson_id}/attempts",
+        "/api/v1/attempts/{attempt_id}/answers",
+        "/api/v1/hearts/refill",
     }.issubset(document["paths"])
 
     lesson_schema = document["components"]["schemas"]["ExerciseResponse"]

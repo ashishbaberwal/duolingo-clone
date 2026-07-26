@@ -137,13 +137,7 @@ def get_lesson_for_learner(
     learner: User,
     lesson_id: int,
 ) -> LessonResponse:
-    lesson = get_lesson_with_content(session, lesson_id)
-    if lesson is None:
-        raise LessonNotFoundError
-
-    progress_by_skill = get_skill_progress(session, learner.id)
-    if _skill_state(lesson.skill, progress_by_skill) == SkillState.LOCKED:
-        raise LessonLockedError
+    lesson = get_accessible_lesson(session, learner, lesson_id)
 
     exercises = [
         ExerciseResponse(
@@ -175,3 +169,19 @@ def get_lesson_for_learner(
         exercise_count=len(exercises),
         exercises=exercises,
     )
+
+
+def get_accessible_lesson(
+    session: Session,
+    learner: User,
+    lesson_id: int,
+) -> Lesson:
+    lesson = get_lesson_with_content(session, lesson_id)
+    if lesson is None:
+        raise LessonNotFoundError
+
+    progress_by_skill = get_skill_progress(session, learner.id)
+    if _skill_state(lesson.skill, progress_by_skill) == SkillState.LOCKED:
+        raise LessonLockedError
+
+    return lesson

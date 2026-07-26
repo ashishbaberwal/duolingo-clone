@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.routes.attempts import router as attempts_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.health import router as health_router
 from app.api.routes.leaderboard import router as leaderboard_router
@@ -10,5 +11,6 @@ api_router = APIRouter()
 api_router.include_router(health_router, tags=["system"])
 api_router.include_router(auth_router, tags=["authentication"])
 api_router.include_router(learning_router, tags=["learning"])
+api_router.include_router(attempts_router, tags=["lesson attempts"])
 api_router.include_router(profile_router, tags=["learner"])
 api_router.include_router(leaderboard_router, tags=["leaderboard"])

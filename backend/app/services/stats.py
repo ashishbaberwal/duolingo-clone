@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import func, select
@@ -11,6 +11,19 @@ from app.schemas.common import LearnerStats
 
 def current_date_for_learner(user: User) -> date:
     return datetime.now(ZoneInfo(user.timezone)).date()
+
+
+def record_daily_streak(user: User, activity_date: date) -> None:
+    if user.last_activity_date == activity_date:
+        return
+
+    if user.last_activity_date == activity_date - timedelta(days=1):
+        user.current_streak += 1
+    else:
+        user.current_streak = 1
+
+    user.longest_streak = max(user.longest_streak, user.current_streak)
+    user.last_activity_date = activity_date
 
 
 def get_learner_stats(
