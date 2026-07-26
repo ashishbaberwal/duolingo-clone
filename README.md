@@ -28,6 +28,95 @@ The project currently includes:
 - SQLite foreign keys, uniqueness rules, and check constraints
 - Idempotent Spanish course and learner-progress seed data
 
+## Tech stack
+
+| Layer | Technology | How it is used |
+| --- | --- | --- |
+| Monorepo | Turborepo, pnpm workspaces | Runs frontend and backend tasks from one root command with dependency-aware caching |
+| Frontend | Next.js 16, React 19, TypeScript | App Router pages, protected learner flows, modular interactive UI |
+| Server state | TanStack Query | Typed requests, caching, retries, invalidation, and request cancellation |
+| UI | CSS Modules, Motion, Lucide | Scoped styling, animated feedback, and accessible interface icons |
+| Backend | FastAPI, Python 3.12, Pydantic | Versioned JSON API, validation, authentication, and OpenAPI documentation |
+| Persistence | SQLAlchemy 2, Alembic, SQLite | Relational domain model, migrations, transactions, and local persistent data |
+| Authentication | Argon2id, PyJWT, HttpOnly cookies | Hashed local credentials and signed browser sessions |
+| Quality | Vitest, Testing Library, pytest, mypy, Ruff, ESLint | Behaviour tests, type checks, linting, and production validation |
+
+pnpm owns JavaScript packages and workspace orchestration. uv independently
+owns the Python environment and backend builds. This preserves the native
+tooling and lockfile for each ecosystem.
+
+## Architecture overview
+
+```text
+Browser
+  |
+  | HttpOnly session cookie + versioned JSON
+  v
+Next.js frontend
+  routes -> AuthGuard -> feature pages -> typed TanStack Query hooks
+  shared shell + focused feature components
+  |
+  v
+FastAPI backend
+  routes -> Pydantic schemas -> services -> repositories
+  |
+  v
+SQLAlchemy unit of work -> SQLite
+```
+
+The frontend never calculates authoritative XP, hearts, streaks, answers, or
+rankings. It renders server state and manages short-lived interaction state such
+as selected words. FastAPI owns evaluation and progression rules. Services
+coordinate use cases, repositories isolate recurring queries, and SQLAlchemy
+transactions persist a completed state change atomically.
+
+The monorepo keeps deployable applications in `frontend/` and `backend/`.
+Reusable UI lives at frontend application scope, while feature-specific code is
+grouped under `frontend/src/features`. Backend routes, schemas, services,
+repositories, and models have separate responsibilities.
+
+## Database schema overview
+
+The SQLite schema is relational rather than storing a course or attempt as one
+large JSON document:
+
+```text
+Course -> Unit -> Skill -> Lesson -> Exercise
+                    |                     |
+                    +-> SkillPrerequisite |
+                                          v
+User -> SkillProgress          Attempt -> AttemptAnswer
+  |         |
+  +-> DailyActivity
+  +-> UserAchievement -> Achievement
+```
+
+- Ordered uniqueness constraints protect unit, skill, lesson, and exercise
+  positions.
+- Prerequisite rows form the skill dependency graph.
+- Attempts and answers preserve lesson history and resumability.
+- Daily activity makes streak and daily-goal logic date-testable.
+- User-owned progress rows keep hearts, XP, streaks, and completion persistent
+  per learner.
+- Alembic is the source-controlled schema history; model and migration drift is
+  tested.
+
+See [docs/database-schema.md](docs/database-schema.md) for table-level details
+and relationship rationale.
+
+## Assignment assumptions
+
+- One English-to-Spanish course is enough for the requested seeded scope.
+- Audio and speech recognition are optional, so exercises use text prompts.
+- Gems are a persisted but mocked currency; there is no payment workflow.
+- Practice refill is intentionally mocked and restores hearts immediately.
+- Local authentication uses one documented demo account while still applying
+  production-style password hashing and HttpOnly cookie boundaries.
+- Leaderboard opponents are seeded users and ranking uses total XP.
+- Quests, Shop, Settings, Search, and Guidebook are explicit placeholders.
+- Responsive CSS is included, but mobile-browser QA is excluded from this
+  submission run at the project owner's request.
+
 ## Repository structure
 
 ```text
@@ -222,3 +311,6 @@ answer privacy, transaction rules, and interview explanations.
 See the [profile and leaderboard guide](docs/profile-and-leaderboard.md) for
 component boundaries, query ownership, edge-case handling, and interview-ready
 trade-offs.
+
+The complete PDF-to-code audit is recorded in
+[docs/assignment-compliance.md](docs/assignment-compliance.md).
