@@ -1,27 +1,65 @@
 # Authentication guide
 
-LingoTrail includes one local demo account for the assignment:
+LingoTrail has no shared default learner. A visitor creates an account at
+`/signup`, then signs in at `/login` with the username and password they chose.
+Each account owns its progress, attempts, hearts, XP, streak, achievements, and
+leaderboard identity.
+
+## Registration flow
 
 ```text
-Username: learner
-Password: LingoTrail@123
+Signup form
+   |
+   | POST /api/v1/auth/register
+   v
+Pydantic normalizes and validates fields
+   |
+   v
+Service checks username/email -> Argon2 hashes password
+   |
+   v
+SQLAlchemy inserts a fresh user in one transaction
+   |
+   v
+201 Created -> login page (no automatic session)
 ```
 
-Open `http://localhost:3000/login` after starting both applications. These
-credentials are intentionally documented for local evaluation; they are not
-production credentials.
+Registration accepts:
 
-## Request flow
+```json
+{
+  "display_name": "Trail Explorer",
+  "username": "trail-explorer",
+  "email": "trail@example.com",
+  "password": "StrongPass1"
+}
+```
+
+Rules:
+
+- display name: 2–100 characters after whitespace normalization;
+- username: 3–30 characters, normalized to lowercase, using letters, numbers,
+  dots, underscores, and hyphens;
+- email: valid, normalized to lowercase, and unique;
+- password: 8–128 characters with uppercase, lowercase, and a number.
+
+The frontend checks password confirmation but never sends or stores the
+confirmation. Username and email have both application checks and database
+unique constraints. The service also catches `IntegrityError`, so concurrent
+requests cannot bypass uniqueness through a race condition.
+
+A new user starts with 5 hearts, 500 gems, 0 XP, 0 streak, and a 20 XP daily
+goal. No progress rows are copied from another user. The first skill is
+available because it has no prerequisite; later skills remain locked.
+
+## Login flow
 
 ```text
 Login form
    |
    | POST /api/v1/auth/login
    v
-FastAPI validates input
-   |
-   v
-SQLAlchemy loads user -> Argon2 verifies password
+SQLAlchemy loads normalized username -> Argon2 verifies password
    |
    v
 PyJWT signs user ID + issuer + audience + issued/expiry times
@@ -34,30 +72,19 @@ HttpOnly, SameSite=Lax cookie
    +--> FastAPI verifies the token and reloads the database user
 ```
 
-The cookie is never read by frontend JavaScript. Browser requests use
-`credentials: "include"`, allowing the browser to attach it automatically.
-
-## Endpoints
-
-```text
-POST /api/v1/auth/login
-GET  /api/v1/auth/me
-POST /api/v1/auth/logout
-```
-
-Login accepts JSON:
+Login accepts:
 
 ```json
 {
-  "username": "learner",
-  "password": "LingoTrail@123"
+  "username": "trail-explorer",
+  "password": "StrongPass1"
 }
 ```
 
-The response contains only safe learner identity fields. It does not return the
-JWT or password hash in JSON.
+The response contains only safe identity fields. It never returns the JWT,
+plaintext password, or password hash in JSON.
 
-Invalid usernames and invalid passwords return the same response:
+Invalid usernames and passwords share one response:
 
 ```http
 401 Unauthorized
@@ -69,9 +96,28 @@ Invalid usernames and invalid passwords return the same response:
 }
 ```
 
-The service performs a dummy Argon2 verification when the username does not
+The service performs a dummy Argon2 verification when a username does not
 exist, reducing the timing difference that could otherwise reveal registered
 usernames.
+
+## Endpoints
+
+```text
+POST /api/v1/auth/register
+POST /api/v1/auth/login
+GET  /api/v1/auth/me
+POST /api/v1/auth/logout
+```
+
+## Why registration does not auto-login
+
+The requested product journey explicitly separates account creation from
+credential proof. Registration returns the safe new-user identity, then the
+browser redirects to login with only the username in the query string. The
+password remains in component memory and is never put in a URL.
+
+This also keeps responsibilities clear: registration creates identity; login
+creates a session.
 
 ## Cookie settings
 
@@ -81,42 +127,37 @@ usernames.
 - `Max-Age=28800`: the local session expires after eight hours.
 - `Secure`: enabled automatically when `APP_ENV=production`.
 
-CORS permits credentials only from the configured `FRONTEND_ORIGIN`.
+CORS permits credentials only from the configured `FRONTEND_ORIGIN`. Browser
+requests use `credentials: "include"` so the browser attaches the cookie
+without exposing it to React.
 
 ## Route protection
 
-Next.js 16 `proxy.ts` checks whether the cookie exists before rendering `/` or
-`/lesson/*`. This is only an optimistic user-experience check.
+Next.js 16 `proxy.ts` checks cookie presence before rendering `/` or
+`/lesson/*`. This is an optimistic user-experience check, not authorization.
 
-Every learner API uses the FastAPI learner dependency, which verifies:
+Every learner API independently verifies:
 
-1. JWT signature and fixed HS256 algorithm.
-2. Required subject, issued-at, expiration, issuer, and audience claims.
-3. Token expiry.
-4. A corresponding user still exists in the database.
+1. JWT signature and fixed HS256 algorithm;
+2. required subject, issued-at, expiration, issuer, and audience claims;
+3. token expiry;
+4. that the corresponding database user still exists.
 
-Authorization therefore remains secure even if a client bypasses the Next.js
-redirect or calls FastAPI directly.
+Direct API calls therefore receive `401` without a valid session even if a
+client bypasses frontend routing.
 
-## Password storage and seed behavior
+## Password and seed behavior
 
-`users.password_hash` stores an Argon2id hash. Other leaderboard-only users
-receive the unusable marker `!`; only the configured demo learner can log in.
+`users.password_hash` stores Argon2id hashes for registered accounts. The four
+seeded leaderboard competitors have an unusable `!` marker, no email, and no
+learner history; they make the ranking meaningful but cannot log in.
 
-The seed command is idempotent. On an existing database it upgrades the demo
-learner's password hash without recreating course content or losing progress.
+## Production hardening beyond the assignment
 
-## Production changes
-
-Before production:
-
-- Generate a random `AUTH_SECRET_KEY` of at least 32 bytes.
-- The API deliberately refuses to start in production with the documented
-  development secret or a secret shorter than 32 characters.
-- Override `DEMO_LEARNER_PASSWORD` or replace demo seeding entirely.
-- Serve frontend and API over HTTPS so the cookie is `Secure`.
-- Add rate limiting and login-attempt monitoring.
-- Add account registration, password reset, and optional MFA as product needs
-  require.
-- Consider revocable database sessions if immediate server-side invalidation
-  across devices is required.
+- Keep a random `AUTH_SECRET_KEY` of at least 32 bytes in backend-only
+  environment configuration.
+- Add rate limiting, suspicious-login monitoring, and optional lockout.
+- Add verified-email ownership, password reset, and optional MFA.
+- Add CSRF tokens if cross-site deployment or cookie policy changes.
+- Use revocable database sessions if immediate per-device invalidation is
+  required.

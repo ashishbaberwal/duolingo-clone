@@ -46,7 +46,7 @@
 - [Testing and quality](#testing-and-quality)
 - [Production deployment](#production-deployment)
 - [Engineering decisions and trade-offs](#engineering-decisions-and-trade-offs)
-- [Interview preparation](#interview-preparation)
+- [Technical questions and answers](#technical-questions-and-answers)
 - [Scaling beyond the assignment](#scaling-beyond-the-assignment)
 
 ## Try the application
@@ -54,13 +54,14 @@
 | Item | Value |
 | --- | --- |
 | Application | [https://lingotrail-scaler.vercel.app](https://lingotrail-scaler.vercel.app) |
-| Username | `learner` |
-| Password | `LingoTrail@123` |
+| New account | Open `/signup`, enter your details, then sign in |
 | Backend health | [Public health endpoint](https://lingotrail-api-139-59-18-245.sslip.io/api/v1/health) |
 | Local API documentation | `http://localhost:8000/docs` |
 
-The demo password is seed data for the assignment. The database stores its
-Argon2id hash, not its plaintext value.
+There is no shared default learner. Every evaluator creates an independent
+account whose password is stored only as an Argon2id hash. XP, hearts, streak,
+skill progress, attempts, achievements, and leaderboard rank then follow that
+authenticated user.
 
 ## Overview
 
@@ -407,7 +408,7 @@ only where exercise types genuinely have different small payload shapes.
 
 ## Authentication and security
 
-### Login flow
+### Registration and login flow
 
 ```mermaid
 sequenceDiagram
@@ -416,6 +417,11 @@ sequenceDiagram
     participant API as FastAPI
     participant DB as SQLite
 
+    Browser->>Next: POST /api/v1/auth/register
+    Next->>API: Forward normalized account details
+    API->>DB: Enforce unique username and email
+    API->>DB: Store user with Argon2id password hash
+    API-->>Browser: 201 account identity (no automatic session)
     Browser->>Next: POST /api/v1/auth/login
     Next->>API: Forward same-origin request
     API->>DB: Load normalized username
@@ -454,9 +460,9 @@ between “unknown user” and “wrong password” responses.
 
 ### Security scope and future hardening
 
-For this single-account assignment, `SameSite=Lax`, same-origin proxying, HTTPS,
-and HttpOnly cookies provide a sensible boundary. A broader production system
-would additionally introduce:
+For this assignment-scale multi-user system, `SameSite=Lax`, same-origin
+proxying, HTTPS, and HttpOnly cookies provide a sensible boundary. A broader
+production system would additionally introduce:
 
 - CSRF tokens for sensitive state-changing flows;
 - login rate limiting and account lockout;
@@ -474,6 +480,7 @@ All learner APIs are versioned under `/api/v1`.
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
 | `GET` | `/api/v1/health` | Service health |
+| `POST` | `/api/v1/auth/register` | Create an independent learner account |
 | `POST` | `/api/v1/auth/login` | Verify credentials and create session |
 | `GET` | `/api/v1/auth/me` | Return current learner |
 | `POST` | `/api/v1/auth/logout` | Clear session cookie |
@@ -621,7 +628,7 @@ those values in browser JavaScript.
 | `pnpm test` | Run frontend and backend tests |
 | `pnpm build` | Build both applications |
 | `pnpm db:migrate` | Apply Alembic migrations |
-| `pnpm db:seed` | Seed course content and demo users |
+| `pnpm db:seed` | Seed course content and leaderboard competitors |
 
 ### Migration workflow
 
@@ -647,14 +654,14 @@ pnpm check
 Current verified result:
 
 ```text
-Backend tests:  41 passed
-Frontend tests: 17 passed
+Backend tests:  50 passed
+Frontend tests: 22 passed
 Turbo tasks:     8 / 8 successful
 ```
 
 ### What is tested
 
-- API health and authentication
+- API health, registration, login, and duplicate-account handling
 - Session-token validation and production configuration
 - Learning path states
 - All exercise-answer formats
@@ -663,7 +670,7 @@ Turbo tasks:     8 / 8 successful
 - SQLAlchemy constraints and relationships
 - Alembic upgrade/downgrade behavior
 - Idempotent seed behavior
-- Login, learning path, lesson player, profile, and leaderboard rendering
+- Signup, login, learning path, lesson player, profile, and leaderboard rendering
 - Loading and recoverable error experiences
 - Frontend and backend production builds
 
@@ -760,13 +767,10 @@ The complete operational runbook is in
 Architecture decision records with deeper reasoning are available in
 [`docs/decisions`](docs/decisions).
 
-## Interview preparation
+## Technical questions and answers
 
-The answers below are grounded in this repository's implementation. Expand the
-section while preparing for a technical discussion.
-
-<details>
-<summary><strong>Open the 17 interview questions and answers</strong></summary>
+The following questions and answers explain the reasoning behind the project's
+architecture, security, data model, deployment, and engineering decisions.
 
 ### 1. Why did you use Turborepo when the backend is Python?
 
@@ -893,8 +897,6 @@ server-only proxy variable.
 - failed attempts and unusual answer traffic;
 - Caddy certificate renewal;
 - Vercel deployment and rewrite failures.
-
-</details>
 
 ## Scaling beyond the assignment
 

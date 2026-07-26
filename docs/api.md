@@ -26,7 +26,23 @@ valid session they return:
 }
 ```
 
-Use the local login endpoint with the documented demo credentials:
+Create a learner account:
+
+```http
+POST /api/v1/auth/register
+```
+
+```json
+{
+  "display_name": "Trail Explorer",
+  "username": "trail-explorer",
+  "email": "trail@example.com",
+  "password": "StrongPass1"
+}
+```
+
+Registration returns `201 Created` but deliberately does not create a session.
+The learner proves the password through the normal login endpoint:
 
 ```http
 POST /api/v1/auth/login

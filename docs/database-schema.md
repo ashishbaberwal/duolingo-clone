@@ -76,11 +76,11 @@ JSON document. Multiple-choice correctness and match-pair metadata live here.
 
 ### `users`
 
-Stores the authenticated demo learner and seeded leaderboard users. The
-`password_hash` column contains an Argon2id hash for the demo learner and an
-unusable marker for leaderboard-only users. Hearts, gems, total XP, streak
-summaries, timezone, and daily goal live here because they are read on almost
-every page.
+Stores registered learners and seeded leaderboard-only competitors. Username
+and email are unique. Registered accounts receive an Argon2id password hash;
+competitor rows use an unusable marker and cannot authenticate. Hearts, gems,
+total XP, streak summaries, timezone, and daily goal live here because they are
+read on almost every page.
 
 Database checks prevent invalid states such as negative XP, negative hearts, or
 hearts exceeding the configured maximum.

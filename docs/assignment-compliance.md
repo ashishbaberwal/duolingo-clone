@@ -86,8 +86,8 @@ existing Duolingo clone repository.
 - Achievement and badge system.
 - Functioning leaderboard across seeded users.
 - Responsive desktop, tablet, and mobile CSS.
-- Simplified real authentication with Argon2id password hashing and signed
-  HttpOnly cookies.
+- Self-registration with unique username/email enforcement, Argon2id password
+  hashing, and signed HttpOnly-cookie sessions.
 - Resumable lesson-attempt lifecycle.
 - Recoverable API errors and accessible loading states.
 
@@ -95,12 +95,12 @@ Audio, timed challenges, and dark mode remain optional and are not implemented.
 
 ## Validation evidence
 
-- Backend: 41 pytest tests.
-- Frontend: 17 Vitest/Testing Library tests.
+- Backend: 50 pytest tests.
+- Frontend: 22 Vitest/Testing Library tests.
 - Monorepo gate: lint, type checking, tests, and production build in both
   workspaces.
-- Desktop browser: login, learning path, all five exercise types, Profile, and
-  Leaderboard.
+- Desktop browser: signup, login, fresh per-user state, learning path, all five
+  exercise types, Profile, and dynamic Leaderboard identity.
 - Browser console during the latest social-page QA: zero errors and warnings.
 - Mobile-browser testing intentionally not run; responsive rules remain in code.
 

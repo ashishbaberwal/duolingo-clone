@@ -200,15 +200,16 @@ Never overwrite the live database while FastAPI is running.
 
 ## Production smoke test
 
-1. Open `https://lingotrail-scaler.vercel.app/login`.
-2. Sign in with `learner` / `LingoTrail@123`.
-3. Confirm the learning path and stats load.
-4. Complete a lesson and record the XP total.
-5. Reload and confirm XP and path progress persist.
-6. Open Profile and Leaderboards.
-7. Restart `lingotrail-api` and confirm the XP remains.
-8. Check browser and systemd logs for errors.
-9. Check the public backend health endpoint.
+1. Open `https://lingotrail-scaler.vercel.app/signup`.
+2. Create a unique account, then sign in with those details.
+3. Confirm the fresh path shows 0 XP, 0 streak, 5 hearts, and only Basics
+   available.
+4. Confirm the new account appears as `YOU` on the leaderboard.
+5. Complete a lesson and record the XP total.
+6. Reload and confirm XP and path progress persist.
+7. Open Profile and Leaderboards and confirm both use the new identity.
+8. Restart `lingotrail-api` and confirm the XP remains.
+9. Check browser/systemd logs and the public backend health endpoint.
 
 ## Rollback
 
