@@ -1,0 +1,53 @@
+name: Deploy Backend
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-backend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to DigitalOcean
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DROPLET_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.DROPLET_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${SSH_PRIVATE_KEY}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "${SSH_KNOWN_HOSTS}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy backend
+        env:
+          DROPLET_HOST: ${{ vars.DROPLET_HOST }}
+          DROPLET_USER: ${{ vars.DROPLET_USER }}
+        run: |
+          ssh \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            "${DROPLET_USER}@${DROPLET_HOST}" \
+            'cd /opt/lingotrail &&
+             git pull --ff-only origin main &&
+             ./deploy/digitalocean/update.sh'
+
+      - name: Verify public API
+        run: |
+          curl \
+            --fail \
+            --show-error \
+            --silent \
+            --retry 5 \
+            --retry-delay 3 \
+            https://lingotrail-api-139-59-18-245.sslip.io/api/v1/health

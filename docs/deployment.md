@@ -162,8 +162,34 @@ On the Droplet:
 ```bash
 cd /opt/lingotrail
 git pull --ff-only origin main
-sudo ./deploy/digitalocean/install.sh
+sudo ./deploy/digitalocean/update.sh
 ```
+
+`update.sh` refreshes a consistent SQLite safety copy at
+`/var/lib/lingotrail/lingotrail-before-deploy.db`, runs the idempotent native
+installer, restarts the API, verifies both systemd services, and checks the
+local health endpoint.
+
+### GitHub Actions deployment button
+
+The manual `.github/workflows/deploy-backend.yml` workflow provides a
+browser-only production deployment:
+
+```text
+GitHub → Actions → Deploy Backend → Run workflow
+```
+
+It uses the `production` GitHub environment with:
+
+- secret `DROPLET_SSH_PRIVATE_KEY`;
+- secret `DROPLET_KNOWN_HOSTS`;
+- variable `DROPLET_HOST`;
+- variable `DROPLET_USER`.
+
+The workflow permits only repository reads, prevents overlapping production
+deployments, connects with strict SSH host verification, calls `update.sh`,
+and verifies the public HTTPS health endpoint. It runs only when manually
+dispatched; pushing to `main` alone does not deploy the backend.
 
 Check service state and logs:
 
