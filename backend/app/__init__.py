@@ -1,0 +1,1 @@
+"""LingoTrail backend application."""

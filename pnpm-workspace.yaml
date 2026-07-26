@@ -1,0 +1,10 @@
+packages:
+  - "frontend"
+  - "backend"
+  - "packages/*"
+
+confirmModulesPurge: false
+
+allowBuilds:
+  sharp: true
+  unrs-resolver: true

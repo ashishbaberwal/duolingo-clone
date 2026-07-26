@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+:root {
+  --leaf: #58cc02;
+  --leaf-dark: #3f9700;
+  --ink: #3c3c3c;
+  --muted: #777777;
+  --line: #e5e5e5;
+  --sky: #ddf4ff;
+  --paper: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 18% 20%, #efffdc 0 10%, transparent 31%),
+    radial-gradient(circle at 84% 78%, var(--sky) 0 12%, transparent 34%),
+    #fbfcf7;
+  font-family: "Avenir Next Rounded", "Nunito", sans-serif;
+}
+
+.foundation-shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+}
+
+.foundation-card {
+  width: min(100%, 560px);
+  padding: 48px;
+  border: 2px solid var(--line);
+  border-radius: 32px;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  box-shadow: 0 10px 0 #d8e7c8;
+  text-align: center;
+}
+
+.foundation-eyebrow {
+  color: var(--leaf-dark);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.foundation-mascot {
+  display: grid;
+  width: 82px;
+  height: 76px;
+  margin: 22px auto;
+  place-items: center;
+  border-radius: 28px 28px 22px 22px;
+  color: white;
+  background: var(--leaf);
+  box-shadow: 0 7px 0 var(--leaf-dark);
+  font-size: 38px;
+  font-weight: 900;
+}
+
+.foundation-card h1 {
+  margin: 0;
+  font-size: clamp(32px, 7vw, 48px);
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+}
+
+.foundation-card p {
+  max-width: 430px;
+  margin: 20px auto 28px;
+  color: var(--muted);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.foundation-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  color: var(--leaf-dark);
+  background: #efffdc;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.foundation-status span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--leaf);
+  box-shadow: 0 0 0 5px rgb(88 204 2 / 16%);
+}
+
+@media (max-width: 560px) {
+  .foundation-card {
+    padding: 38px 24px;
+    border-radius: 26px;
+  }
+}
