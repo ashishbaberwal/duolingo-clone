@@ -1,4 +1,4 @@
-import { LearnPage } from "@/features/learn/learn-page";
+import { LearnPage } from "@/features/learn";
 
 export default function HomePage() {
   return <LearnPage />;

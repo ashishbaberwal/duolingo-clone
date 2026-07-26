@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-interface PipMascotProps extends SVGProps<SVGSVGElement> {
+export interface PipMascotProps extends SVGProps<SVGSVGElement> {
   mood?: "cheerful" | "focused";
 }
 

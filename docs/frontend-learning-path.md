@@ -24,13 +24,48 @@ typed fetch client -> TanStack Query cache -> LearnPage
 ## Component responsibilities
 
 - `LearnPage` owns the remote-data states: loading, failure, and success.
-- `AppShell` owns responsive navigation, learner stats, and the supporting
-  desktop rail.
+- `AppShell` composes responsive navigation, learner stats, and the supporting
+  desktop rail from focused child components.
 - `LearningPath` maps API units and skills to the winding course trail.
-- `SkillButton` turns backend `completed`, `available`, and `locked` states into
+- `SkillNode` turns backend `completed`, `available`, and `locked` states into
   distinct controls and opens one detail card at a time.
 - `PipMascot` is an original inline SVG component. Keeping it in code makes its
   colors responsive to the design system without adding an image request.
+
+The feature uses an explicit public entry point and keeps implementation details
+inside the feature:
+
+```text
+features/learn/
+├── components/
+│   ├── app-shell/
+│   │   ├── right-rail/
+│   │   ├── app-shell.tsx
+│   │   ├── mobile-navigation.tsx
+│   │   ├── sidebar.tsx
+│   │   └── stats-bar.tsx
+│   ├── learning-path/
+│   │   ├── learning-path.tsx
+│   │   ├── skill-details.tsx
+│   │   ├── skill-node.tsx
+│   │   ├── trail-decoration.tsx
+│   │   ├── unit-banner.tsx
+│   │   └── unit-section.tsx
+│   ├── page-states/
+│   └── pip-mascot.tsx
+├── styles/
+│   ├── app-shell.module.css
+│   ├── learn-page.module.css
+│   └── learning-path.module.css
+├── index.ts
+├── learn-page.tsx
+└── learn.constants.ts
+```
+
+Substantial visual components have one module each. Tiny calculations stay
+beside their only consumer, while navigation configuration and path geometry
+live in one constants module. Styles are split by the same ownership boundaries
+as the components instead of accumulating in one global feature stylesheet.
 
 The temporary `/lesson/[lessonId]` route deliberately prevents a valid lesson
 link from ending at a 404 while the lesson-player checkpoint is still pending.
