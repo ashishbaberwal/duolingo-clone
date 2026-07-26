@@ -20,6 +20,8 @@ The project currently includes:
 - Interactive lesson player with all five required exercise types
 - Immediate answer feedback, persistent hearts, XP, streaks, and skill progress
 - Resumable lesson attempts, completion celebration, and mocked heart refill
+- Profile dashboard with progress statistics, daily goal, and achievements
+- Ranked league podium and standings with current-learner highlighting
 - Versioned course, lesson, profile, and leaderboard APIs
 - SQLAlchemy domain model for content, progress, and lesson attempts
 - Alembic migration workflow with a reversible initial schema
@@ -204,6 +206,11 @@ typed-answer exercises. FastAPI evaluates every submission, while React owns
 only the current draft and feedback transition. Persistent attempt, heart, XP,
 streak, and progress state remains authoritative on the backend.
 
+The Profile and Leaderboard routes reuse an application-level shell with
+route-aware navigation. Typed TanStack Query hooks compose the focused profile
+and ranking APIs, while modular feature components render identity, goals,
+badges, the league podium, and current-learner standings.
+
 See the [frontend learning-path guide](docs/frontend-learning-path.md) and
 [ADR 004](docs/decisions/004-frontend-state-and-interaction.md) for component
 responsibilities, responsive behavior, and the alternatives considered.
@@ -211,3 +218,7 @@ responsibilities, responsive behavior, and the alternatives considered.
 See the [lesson-loop guide](docs/lesson-loop.md) and
 [ADR 006](docs/decisions/006-lesson-attempt-lifecycle.md) for exercise payloads,
 answer privacy, transaction rules, and interview explanations.
+
+See the [profile and leaderboard guide](docs/profile-and-leaderboard.md) for
+component boundaries, query ownership, edge-case handling, and interview-ready
+trade-offs.
