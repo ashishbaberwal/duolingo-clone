@@ -6,6 +6,20 @@ export const metadata: Metadata = {
   description: "Return to your LingoTrail language-learning path.",
 };
 
-export default function LoginPage() {
-  return <AuthPage />;
+interface LoginPageProps {
+  searchParams?: Promise<{
+    created?: string;
+    username?: string;
+  }>;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = searchParams ? await searchParams : {};
+
+  return (
+    <AuthPage
+      accountCreated={params.created === "true"}
+      initialUsername={params.username ?? ""}
+    />
+  );
 }

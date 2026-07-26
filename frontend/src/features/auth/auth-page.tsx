@@ -1,19 +1,21 @@
-import { LoginBrandPanel } from "./components/login-brand-panel";
+import { AuthShell } from "./components/auth-shell";
 import { LoginForm } from "./components/login-form";
-import styles from "./styles/auth.module.css";
 
-export function AuthPage() {
+interface AuthPageProps {
+  accountCreated?: boolean;
+  initialUsername?: string;
+}
+
+export function AuthPage({
+  accountCreated = false,
+  initialUsername = "",
+}: AuthPageProps) {
   return (
-    <main className={styles.authPage}>
-      <div className={styles.authFrame}>
-        <LoginBrandPanel />
-        <section className={styles.formPanel}>
-          <LoginForm />
-          <p className={styles.assignmentLabel}>
-            SCALER AI INTERNSHIP · FULL-STACK ASSIGNMENT
-          </p>
-        </section>
-      </div>
-    </main>
+    <AuthShell>
+      <LoginForm
+        accountCreated={accountCreated}
+        initialUsername={initialUsername}
+      />
+    </AuthShell>
   );
 }

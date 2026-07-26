@@ -11,6 +11,8 @@ import type {
   AuthenticatedUser,
   LoginCredentials,
   LogoutResponse,
+  RegisteredUser,
+  RegistrationDetails,
 } from "./auth.types";
 
 export const currentUserQueryKey = ["current-user"] as const;
@@ -43,6 +45,17 @@ export function useLogin() {
     },
   });
 }
+
+export function useRegister() {
+  return useMutation({
+    mutationFn: (details: RegistrationDetails) =>
+      apiRequest<RegisteredUser>("/api/v1/auth/register", {
+        method: "POST",
+        body: details,
+      }),
+  });
+}
+
 export function useLogout() {
   const queryClient = useQueryClient();
 

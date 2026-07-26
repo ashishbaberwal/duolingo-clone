@@ -1,19 +1,27 @@
 "use client";
 
-import { Eye, EyeOff, LockKeyhole, UserRound } from "lucide-react";
+import { UserRound } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { ApiError } from "@/lib/api/client";
-import { DEMO_CREDENTIALS } from "../auth.constants";
 import { useLogin } from "../auth.queries";
 import styles from "../styles/auth.module.css";
+import { PasswordField } from "./password-field";
 
-export function LoginForm() {
+interface LoginFormProps {
+  accountCreated?: boolean;
+  initialUsername?: string;
+}
+
+export function LoginForm({
+  accountCreated = false,
+  initialUsername = "",
+}: LoginFormProps) {
   const router = useRouter();
   const login = useLogin();
-  const [username, setUsername] = useState<string>(DEMO_CREDENTIALS.username);
-  const [password, setPassword] = useState<string>(DEMO_CREDENTIALS.password);
-  const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState(initialUsername);
+  const [password, setPassword] = useState("");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,12 +44,18 @@ export function LoginForm() {
         : null;
 
   return (
-    <form className={styles.loginForm} onSubmit={handleSubmit}>
+    <form className={styles.loginForm} method="post" onSubmit={handleSubmit}>
       <div className={styles.formHeading}>
-        <span>LOCAL LEARNER ACCESS</span>
+        <span>YOUR LEARNING ACCOUNT</span>
         <h2>Welcome back</h2>
-        <p>Sign in to continue Ava&apos;s Spanish course.</p>
+        <p>Sign in to continue from exactly where you stopped.</p>
       </div>
+
+      {accountCreated ? (
+        <div className={styles.successMessage} role="status">
+          Account created. Sign in with your new username and password.
+        </div>
+      ) : null}
 
       <label className={styles.field}>
         <span>Username</span>
@@ -58,36 +72,13 @@ export function LoginForm() {
         </div>
       </label>
 
-      <label className={styles.field}>
-        <span>Password</span>
-        <div className={styles.inputWrap}>
-          <LockKeyhole aria-hidden="true" />
-          <input
-            autoComplete="current-password"
-            maxLength={128}
-            name="password"
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            type={showPassword ? "text" : "password"}
-            value={password}
-          />
-          <button
-            className={styles.passwordToggle}
-            type="button"
-            onClick={() => setShowPassword((visible) => !visible)}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-          >
-            {showPassword ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
-          </button>
-        </div>
-      </label>
-
-      <div className={styles.demoCredentials}>
-        <span>DEMO CREDENTIALS</span>
-        <code>{DEMO_CREDENTIALS.username}</code>
-        <span className={styles.credentialDivider}>/</span>
-        <code>{DEMO_CREDENTIALS.password}</code>
-      </div>
+      <PasswordField
+        autoComplete="current-password"
+        label="Password"
+        name="password"
+        onChange={setPassword}
+        value={password}
+      />
 
       <div className={styles.formFeedback} aria-live="polite">
         {errorMessage}
@@ -102,8 +93,8 @@ export function LoginForm() {
         {login.isPending ? "Opening your trail…" : "Continue learning"}
       </button>
 
-      <p className={styles.localNote}>
-        Local assignment account · Password is stored as an Argon2 hash
+      <p className={styles.authSwitch}>
+        New to LingoTrail? <Link href="/signup">Create your account</Link>
       </p>
     </form>
   );

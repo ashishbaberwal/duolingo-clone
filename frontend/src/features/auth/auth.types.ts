@@ -10,6 +10,17 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface RegistrationDetails {
+  display_name: string;
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface RegisteredUser extends AuthenticatedUser {
+  email: string;
+}
+
 export interface LogoutResponse {
   message: string;
 }
