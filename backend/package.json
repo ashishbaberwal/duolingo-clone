@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "uv run uvicorn app.main:app --reload --port 8000",
     "build": "uv build --out-dir dist",
+    "db:migrate": "uv run alembic upgrade head",
+    "db:seed": "uv run python -m app.seed",
     "lint": "uv run ruff check .",
     "check-types": "uv run mypy app tests",
     "test": "uv run pytest"

@@ -48,6 +48,7 @@ cd backend
 uv sync
 uv run alembic upgrade head
 cd ..
+pnpm db:seed
 ```
 
 ## Development
@@ -112,3 +113,17 @@ uv run alembic downgrade -1
 The local SQLite file is generated under `backend/data/` and is intentionally
 not committed. See the [database schema guide](docs/database-schema.md) and
 [ADR 002](docs/decisions/002-relational-domain-model.md).
+
+## Seed data
+
+After applying migrations, populate the development database from the repository
+root:
+
+```bash
+pnpm db:seed
+```
+
+The command is idempotent: the first run creates the catalog and sample users,
+while later runs report that the seed is already present without duplicating
+records. The complete dataset is described in
+[docs/seed-data.md](docs/seed-data.md).

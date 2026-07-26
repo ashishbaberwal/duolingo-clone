@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
+    "db:migrate": "pnpm --filter @duo/backend db:migrate",
+    "db:seed": "pnpm --filter @duo/backend db:seed",
     "lint": "turbo lint",
     "check-types": "turbo check-types",
     "test": "turbo test",
