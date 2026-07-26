@@ -51,12 +51,29 @@ The committed lockfiles make dependency installation reproducible.
 
 ```bash
 pnpm install
+
+# Create separate local configuration for each application.
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+
 cd backend
 uv sync
 uv run alembic upgrade head
 cd ..
 pnpm db:seed
 ```
+
+The backend and frontend deliberately use separate environment files:
+
+```text
+backend/.env   Private database, password, JWT signing, cookie, and CORS values
+frontend/.env  Browser-safe API origin and public cookie-name values only
+```
+
+Both actual `.env` files are ignored by Git. Commit only the corresponding
+`.env.example` templates. Never place a signing secret, password, or database
+credential in a `NEXT_PUBLIC_*` variable because Next.js exposes those values
+to browser JavaScript.
 
 ## Development
 
