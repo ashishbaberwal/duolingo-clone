@@ -54,4 +54,4 @@ jobs:
             --retry-all-errors \
             --retry-delay 3 \
             --retry-max-time 60 \
-            https://lingotrail-api-139-59-18-245.sslip.io/api/v1/health
+            https://lingotrail-api-139-59-18-245.sslip.io/api/v1/ready
