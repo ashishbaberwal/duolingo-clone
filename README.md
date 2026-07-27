@@ -6,7 +6,7 @@ A full-stack web application that recreates Duolingo's core learning loop. Learn
 ![Next.js](https://img.shields.io/badge/Next.js-16-black.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Python_3.12-009688.svg)
 ![Database](https://img.shields.io/badge/Database-SQLite-003B57.svg)
-![Tests](https://img.shields.io/badge/tests-74_passing-2EA44F.svg)
+![Tests](https://img.shields.io/badge/tests-79_passing-2EA44F.svg)
 
 [Live Application](https://lingotrail-scaler.vercel.app) ·
 [API Health](https://lingotrail-api-139-59-18-245.sslip.io/api/v1/health) ·
@@ -40,6 +40,14 @@ LingoTrail demonstrates a modern, gamified language-learning workflow with datab
 
 FastAPI owns lesson rules and persistence while Next.js renders the interactive course path and lesson player. SQLite stores content, attempts, progress, daily activity, and achievements for every learner.
 
+### Assumptions
+
+- One seeded Spanish course is sufficient for the assignment scope
+- Every evaluator creates an account; there are no shared default credentials
+- Seeded leaderboard competitors are synthetic and cannot authenticate
+- Hearts refill is mocked; audio, subscriptions, and social features remain placeholders
+- Production runs as one FastAPI process with a persistent SQLite database
+
 ![LingoTrail learning path](.github/assets/learning-path.jpg)
 
 ![LingoTrail learner profile](.github/assets/profile.jpg)
@@ -66,6 +74,7 @@ FastAPI owns lesson rules and persistence while Next.js renders the interactive 
 
 - **Protected Answers**: Canonical answers are excluded from public lesson responses
 - **Secure Authentication**: Argon2id password hashes and signed HttpOnly session cookies
+- **Request Protection**: Production rate limits protect authentication and lesson mutations
 - **Data Integrity**: Ownership checks, relational constraints, and recoverable error states
 
 ## System Architecture
@@ -245,6 +254,7 @@ POST   /api/v1/hearts/refill                   # Restore learner hearts
 GET    /api/v1/profile                         # Retrieve profile and achievements
 GET    /api/v1/leaderboard                     # Retrieve ranked learners
 GET    /api/v1/health                          # Check API availability
+GET    /api/v1/ready                           # Verify database and course readiness
 GET    /docs                                   # Open interactive Swagger UI
 ```
 
@@ -311,7 +321,7 @@ duolingo-clone/
 
 ### Quality & Testing
 
-- `pnpm check` runs linting, strict type checks, 74 tests, and production builds
+- `pnpm check` runs linting, strict type checks, 79 tests, and production builds
 - Tests cover APIs, authentication, progression, lessons, UI states, and themes
 
 ### Error Handling
@@ -324,7 +334,7 @@ duolingo-clone/
 
 - TanStack Query caches server state and mutations invalidate affected keys
 - Frequently joined foreign keys are indexed
-- Caddy compresses responses; Redis caching and rate limiting are future upgrades
+- Caddy compresses responses; Redis caching remains a future scaling option
 
 ---
 
