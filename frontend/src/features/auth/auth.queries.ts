@@ -36,12 +36,12 @@ export function useLogin() {
       apiRequest<AuthenticatedUser>("/api/v1/auth/login", {
         method: "POST",
         body: credentials,
-      }),
+    }),
     onSuccess: (user) => {
+      queryClient.removeQueries({ queryKey: learningPathQueryKey });
+      queryClient.removeQueries({ queryKey: profileQueryKey });
+      queryClient.removeQueries({ queryKey: leaderboardQueryKey });
       queryClient.setQueryData(currentUserQueryKey, user);
-      void queryClient.invalidateQueries({ queryKey: learningPathQueryKey });
-      void queryClient.invalidateQueries({ queryKey: profileQueryKey });
-      void queryClient.invalidateQueries({ queryKey: leaderboardQueryKey });
     },
   });
 }

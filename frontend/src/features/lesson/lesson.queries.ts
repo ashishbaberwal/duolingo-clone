@@ -1,9 +1,22 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { currentUserQueryKey } from "@/features/auth/auth.queries";
+import {
+  type QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { apiGet, apiRequest } from "@/lib/api/client";
-import { learningPathQueryKey } from "@/lib/api/queries";
+import {
+  leaderboardQueryKey,
+  learningPathQueryKey,
+  profileQueryKey,
+} from "@/lib/api/queries";
+import type {
+  LearnerStats,
+  LearningPathResponse,
+  ProfileResponse,
+} from "@/lib/api/types";
 import type {
   AnswerFeedback,
   HeartsRefillResponse,
@@ -42,6 +55,20 @@ interface SubmitAnswerVariables {
   answer: SubmittedAnswer;
 }
 
+function updateCachedLearnerStats(
+  queryClient: QueryClient,
+  learner: LearnerStats,
+) {
+  queryClient.setQueryData<LearningPathResponse>(
+    learningPathQueryKey,
+    (current) => (current ? { ...current, learner } : current),
+  );
+  queryClient.setQueryData<ProfileResponse>(
+    profileQueryKey,
+    (current) => (current ? { ...current, stats: learner } : current),
+  );
+}
+
 export function useSubmitAnswer() {
   const queryClient = useQueryClient();
 
@@ -61,8 +88,13 @@ export function useSubmitAnswer() {
           },
         },
       ),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: learningPathQueryKey });
+    onSuccess: (result) => {
+      updateCachedLearnerStats(queryClient, result.learner);
+      if (result.status === "completed") {
+        void queryClient.invalidateQueries({ queryKey: learningPathQueryKey });
+        void queryClient.invalidateQueries({ queryKey: profileQueryKey });
+        void queryClient.invalidateQueries({ queryKey: leaderboardQueryKey });
+      }
     },
   });
 }
@@ -75,9 +107,8 @@ export function useRefillHearts() {
       apiRequest<HeartsRefillResponse>("/api/v1/hearts/refill", {
         method: "POST",
       }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: learningPathQueryKey });
-      void queryClient.invalidateQueries({ queryKey: currentUserQueryKey });
+    onSuccess: (result) => {
+      updateCachedLearnerStats(queryClient, result.learner);
     },
   });
 }
